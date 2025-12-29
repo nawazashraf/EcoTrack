@@ -30,27 +30,50 @@ const EmissionTrendsChart = ({ data }: Props) => {
   }));
 
   return (
-    <div className="bg-white rounded-2xl shadow p-6">
-      <h2 className="text-lg font-semibold mb-4">
+    <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+      <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
         Monthly Emission Trends
       </h2>
 
-      <ResponsiveContainer width="100%" height={320}>
-        <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
-          <YAxis />
-          <Tooltip />
-          <Line
-            type="monotone"
-            dataKey="emissions"
-            stroke="#22c55e"
-            strokeWidth={3}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      {/* Height adapts by screen size */}
+      <div className="w-full h-65 sm:h-75 md:h-85">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+
+            <XAxis
+              dataKey="month"
+              interval="preserveStartEnd"
+              tick={{
+                fontSize: 11,
+              }}
+              angle={-30}
+              textAnchor="end"
+              height={60}
+            />
+
+            <YAxis
+              tick={{ fontSize: 11 }}
+              width={40}
+            />
+
+            <Tooltip
+              formatter={(value: number) => [`${value} kg CO₂e`, "Emissions"]}
+              labelStyle={{ fontSize: 12 }}
+              contentStyle={{ fontSize: 12 }}
+            />
+
+            <Line
+              type="monotone"
+              dataKey="emissions"
+              stroke="#22c55e"
+              strokeWidth={2.5}
+              dot={{ r: 3 }}
+              activeDot={{ r: 5 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

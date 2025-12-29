@@ -2,22 +2,21 @@ import {
   PieChart,
   Pie,
   Cell,
-  ResponsiveContainer,
   Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import type { EmissionBySource } from "@/types/emissions";
 
 const COLORS = ["#2563EB", "#DC2626", "#F59E0B", "#16A34A", "#9333EA"];
 
-const EmissionsBySourceChart = ({
-  data,
-}: {
-  data: EmissionBySource[];
-}) => {
+const EmissionsBySourceChart = ({ data }: { data: EmissionBySource[] }) => {
+  if (!data?.length) return null;
+
   const totalCO2e = data.reduce((s, d) => s + d.totalCO2e, 0);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 h-full flex flex-col">
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 w-full">
+
       {/* Header */}
       <div className="mb-3">
         <h2 className="text-lg font-semibold text-gray-900">
@@ -28,27 +27,42 @@ const EmissionsBySourceChart = ({
         </p>
       </div>
 
-      {/* Chart */}
-      <div className="relative flex-1">
-        <ResponsiveContainer width="100%" height="100%">
+      {/* 🔥 CRITICAL CHANGE: aspect instead of height */}
+      <div className="relative w-full">
+        <ResponsiveContainer width="100%" aspect={1}>
           <PieChart>
             <Pie
               data={data}
-              dataKey="percentage"
+              dataKey="totalCO2e"   // absolute value
               nameKey="category"
-              innerRadius={80}
-              outerRadius={120}
+              cx="50%"
+              cy="50%"
+              innerRadius={70}
+              outerRadius={110}
               paddingAngle={2}
+              isAnimationActive={false}
             >
               {data.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                <Cell
+                  key={i}
+                  fill={COLORS[i % COLORS.length]}
+                />
               ))}
             </Pie>
-            <Tooltip content={<StaticTooltip />} />
+
+            <Tooltip
+              formatter={(value: number, _n, props) => {
+                const pct = props.payload.percentage;
+                return [
+                  `${value.toLocaleString()} kg (${pct}%)`,
+                  "Emissions",
+                ];
+              }}
+            />
           </PieChart>
         </ResponsiveContainer>
 
-        {/* Center KPI */}
+        {/* Center label */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <p className="text-sm text-gray-500">Total Emissions</p>
           <p className="text-2xl font-bold text-gray-900">
@@ -59,9 +73,12 @@ const EmissionsBySourceChart = ({
       </div>
 
       {/* Legend */}
-      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
         {data.map((item, i) => (
-          <div key={item.category} className="flex justify-between text-sm">
+          <div
+            key={item.category}
+            className="flex items-center justify-between text-sm"
+          >
             <div className="flex items-center gap-2">
               <span
                 className="h-3 w-3 rounded-full"
@@ -75,23 +92,9 @@ const EmissionsBySourceChart = ({
           </div>
         ))}
       </div>
+
     </div>
   );
 };
 
 export default EmissionsBySourceChart;
-
-const StaticTooltip = ({ active, payload }: any) => {
-  if (!active || !payload?.length) return null;
-  const { category, totalCO2e, percentage } = payload[0].payload;
-
-  return (
-    <div className="rounded-md bg-white border shadow px-3 py-2">
-      <p className="font-semibold text-sm">{category}</p>
-      <p className="text-xs text-gray-500">
-        {totalCO2e.toLocaleString()} kg CO₂e
-      </p>
-      <p className="text-xs text-gray-700">{percentage}%</p>
-    </div>
-  );
-};
