@@ -2,7 +2,6 @@ const ActivityData = require('../models/ActivityData');
 const csv = require('csv-parser');
 const fs = require('fs');
 
-// 1. The "Bulletproof" Upload Function
 exports.uploadActivity = async (req, res) => {
   try {
     if (!req.file) {
@@ -15,7 +14,6 @@ exports.uploadActivity = async (req, res) => {
     fs.createReadStream(filePath)
       .pipe(csv())
       .on('data', (data) => {
-        // Clean Keys (Handle BOM and whitespace)
         const cleanRow = {};
         Object.keys(data).forEach(key => {
           const cleanKey = key.trim().toLowerCase().replace(/^\ufeff/, '');
@@ -41,7 +39,7 @@ exports.uploadActivity = async (req, res) => {
               date: row.date ? new Date(row.date) : new Date(),
               department: row.department || "General",
               scope: scope,
-              co2e: (parseFloat(row.value) * 0.5) // Demo calculation
+              co2e: (parseFloat(row.value) * 0.5)
             };
           }).filter(item => item !== null);
 
@@ -61,12 +59,9 @@ exports.uploadActivity = async (req, res) => {
   }
 };
 
-// 2. The Add Activity Function (Manual Entry)
 exports.addActivity = async (req, res) => {
   try {
     const { category, value, unit, date, department } = req.body;
-    
-    // Scope Logic
     let scope = "Scope 3";
     const cat = category.toLowerCase();
     if (['fuel', 'refrigerants'].some(x => cat.includes(x))) scope = "Scope 1";
@@ -79,7 +74,7 @@ exports.addActivity = async (req, res) => {
       date,
       department,
       scope,
-      co2e: value * 0.5 // Simplified
+      co2e: value * 0.5 
     });
 
     await newActivity.save();
@@ -89,7 +84,6 @@ exports.addActivity = async (req, res) => {
   }
 };
 
-// 3. The Delete All Function (For Cleanup)
 exports.deleteAllActivities = async (req, res) => {
   try {
     await ActivityData.deleteMany({});
