@@ -5,6 +5,8 @@ export const CATEGORIES: DropdownOption[] = [
   { value: "transport", label: "Transport" },
   { value: "waste", label: "Waste" },
   { value: "manufacturing", label: "Manufacturing" },
+  { value: "fuel", label: "Fuel" },
+
 ];
 
 export const DEPARTMENTS: DropdownOption[] = [
@@ -16,6 +18,11 @@ export const DEPARTMENTS: DropdownOption[] = [
 
 export const UNITS_BY_CATEGORY: Record<string, DropdownOption[]> = {
   electricity: [{ value: "kWh", label: "kWh" }],
+  fuel: [
+    { value: "liters", label: "Liters" },
+    { value: "kg", label: "Kilograms" },
+    { value: "m3", label: "Cubic meters" }, // for CNG / Natural Gas
+  ],
   transport: [
     { value: "km", label: "Kilometers" },
     { value: "liters", label: "Liters" },

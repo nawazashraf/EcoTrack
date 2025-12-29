@@ -7,6 +7,7 @@ import {
   DEPARTMENTS,
   UNITS_BY_CATEGORY,
 } from "@/constants/activity.constants";
+import { submitActivity } from "@/api/activity.api";
 
 const AddActivity = () => {
   const [form, setForm] = useState<ActivityForm>({
@@ -25,10 +26,12 @@ const AddActivity = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     //? Handling Activity submission
+
+    await submitActivity(form)
 
     console.log("Submitting Activity:", form);
   };
