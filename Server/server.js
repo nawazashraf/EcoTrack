@@ -3,21 +3,17 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-// Connect to Database
 connectDB();
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 
-// Seed Emission Factors Route (Run once to populate DB)
 const EmissionFactor = require('./models/EmissionFactor');
 app.get('/api/seed', async (req, res) => {
   await EmissionFactor.deleteMany({});
