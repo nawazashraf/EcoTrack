@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getOverview } from "@/api/getOverview.api";
 import type { AnalyticsOverview } from "@/types/analytics";
 import GHGScopeDonutChart from "@/components/GHGScopeDonutChart";
-import GHGScopeInsight from "@/components/GHGScopeInsight";
+import GHGScopeInsight from "@/components/insights/GHGScopeInsight";
 
 
 const GHGScopeAnalysis = () => {
