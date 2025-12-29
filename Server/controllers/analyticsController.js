@@ -72,10 +72,38 @@ exports.getRecommendations = async (req, res) => {
 
 exports.getPrediction = async (req, res) => {
   try {
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
     const data = await ActivityData.aggregate([
-      { $group: { _id: null, avg: { $avg: "$co2e" } } }
+      { 
+        $match: { 
+          date: { $gte: threeMonthsAgo } 
+        } 
+      },
+      {
+        $group: {
+          _id: { year: { $year: "$date" }, month: { $month: "$date" } },
+          monthlyTotal: { $sum: "$co2e" }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          avgMonthlyEmission: { $avg: "$monthlyTotal" }
+        }
+      }
     ]);
-    const prediction = data.length ? data[0].avg : 0;
-    res.json({ prediction: prediction.toFixed(2), suggestion: "Reduce energy usage!" });
+
+    const prediction = data.length ? data[0].avgMonthlyEmission : 0;
+    
+    let suggestion = "On track to meet reduction goals.";
+    if (prediction > 1000) suggestion = "Projected to exceed limits. Reduce consumption.";
+
+    res.json({ 
+      predictionForNextMonth: parseFloat(prediction.toFixed(2)), 
+      basedOn: "3-month moving average",
+      suggestion 
+    });
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
