@@ -47,7 +47,7 @@ const GHGScopeAnalysis = () => {
   /* -------------------- Page -------------------- */
 
   return (
-    <div className="min-h-screen w-full bg-[#EDF8FC]">
+    <div className="w-full bg-[#EDF8FC]">
       <div className="max-w-6xl mx-auto p-6 space-y-10">
         {/* Header */}
         <div className="space-y-2">
