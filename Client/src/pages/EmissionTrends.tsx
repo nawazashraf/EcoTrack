@@ -55,7 +55,7 @@ const EmissionTrends = () => {
   }
 
   return (
-    <div className="w-full bg-[#EDF8FC]">
+    <div className="min-h-screen  w-full bg-[#EDF8FC]">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         {/* Page Header */}
         <div>

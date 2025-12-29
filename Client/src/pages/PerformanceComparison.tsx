@@ -30,7 +30,7 @@ const PerformanceComparisonPage = () => {
   if (!data) return <p className="p-6 text-gray-500">No data available</p>;
 
   return (
-    <div className="w-full bg-[#EDF8FC]">
+    <div className="min-h-screen w-full bg-[#EDF8FC]">
       <div className="max-w-6xl mx-auto p-6 space-y-8">
         {/* Header */}
         <div>

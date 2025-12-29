@@ -43,7 +43,7 @@ const EmissionBySource = () => {
   }
 
   return (
-    <div className="w-full bg-[#EDF8FC]">
+    <div className="min-h-screen  w-full bg-[#EDF8FC]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-8">
 
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
