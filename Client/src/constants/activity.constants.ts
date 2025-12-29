@@ -2,7 +2,7 @@ import type { DropdownOption } from "@/types/activity.types";
 
 export const CATEGORIES: DropdownOption[] = [
   { value: "electricity", label: "Electricity" },
-  { value: "transport", label: "Transport" },
+  { value: "transportation", label: "Transportation" },
   { value: "waste", label: "Waste" },
   { value: "manufacturing", label: "Manufacturing" },
   { value: "fuel", label: "Fuel" },

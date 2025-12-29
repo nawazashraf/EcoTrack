@@ -1,13 +1,16 @@
 import React, { useState, useRef } from "react";
 import { Download, Upload, FileText } from "lucide-react";
 import { uploadActivity } from "@/api/uploadActivity.api";
+import { CATEGORIES } from "@/constants/activity.constants";
+
+//TODO Remove Category Input field
 
 const UploadActivity = () => {
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef(null);
-  const [snowflakes, setSnowflakes] = useState([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [snowflakes, setSnowflakes] = useState<any[]>([]);
 
   React.useEffect(() => {
     const flakes = Array.from({ length: 60 }, (_, i) => ({
@@ -15,39 +18,38 @@ const UploadActivity = () => {
       left: Math.random() * 100,
       animationDuration: Math.random() * 4 + 3,
       animationDelay: Math.random() * 5,
-      size: Math.random() * 12 + 8, // Bigger snowflakes: 8-20px
+      size: Math.random() * 12 + 8,
       opacity: Math.random() * 0.7 + 0.3,
     }));
     setSnowflakes(flakes);
   }, []);
 
-  const departments = ["Electricity", "Transport", "Waste", "Manufacturing"];
-
-  const handleDragOver = (e) => {
+  /* ---------------- FILE HANDLERS ---------------- */
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
 
     const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith(".csv") && file.size <= 5 * 1024 * 1024) {
-      setUploadedFile(file);
-    } else {
-      alert("Please upload a valid CSV file (max 5MB)");
-    }
+    validateAndSetFile(file);
   };
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (file && file.name.endsWith(".csv") && file.size <= 5 * 1024 * 1024) {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) validateAndSetFile(file);
+  };
+
+  const validateAndSetFile = (file: File) => {
+    if (file.name.endsWith(".csv") && file.size <= 5 * 1024 * 1024) {
       setUploadedFile(file);
     } else {
       alert("Please upload a valid CSV file (max 5MB)");
@@ -61,18 +63,12 @@ const UploadActivity = () => {
   const downloadTemplate = () => {
     const csvContent =
       "Category,Value,Unit,Date,Department\n" +
-      // ================= ELECTRICITY =================
-      "Electricity,1200,kWh,2024-01-01,Electricity\n" +
-      "Electricity,3500,kWh,2024-01-02,Electricity\n" +
-      // ================= TRANSPORT =================
-      "Transport,120,liters,2024-01-01,Transport\n" +
-      "Transport,260,liters,2024-01-02,Transport\n" +
-      // ================= WASTE =================
-      "Waste,350,kg,2024-01-01,Waste\n" +
-      "Waste,180,kg,2024-01-02,Waste\n" +
-      // ================= MANUFACTURING =================
-      "Manufacturing,1500,kg,2024-01-01,Manufacturing\n" +
-      "Manufacturing,4200,kWh,2024-01-02,Manufacturing\n";
+      "electricity,1200,kWh,2024-01-01,Operations\n" +
+      "electricity,3500,kWh,2024-01-02,Engineering\n" +
+      "transportation,120,liters,2024-01-01,Logistics\n" +
+      "transportation,260,liters,2024-01-02,Logistics\n" +
+      "waste,350,kg,2024-01-01,Admin\n" +
+      "manufacturing,1500,kg,2024-01-01,Engineering\n";
 
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -85,7 +81,13 @@ const UploadActivity = () => {
     window.URL.revokeObjectURL(url);
   };
 
+  /* Handling Uploading CSV File */
   const handleUploadAndProcess = async () => {
+    if (!selectedCategory) {
+      alert("Please select a category");
+      return;
+    }
+
     if (!uploadedFile) {
       alert("Please upload a CSV file");
       return;
@@ -95,18 +97,18 @@ const UploadActivity = () => {
     formData.append("csvFile", uploadedFile);
 
     try {
-      const res = await uploadActivity(formData);
-      console.log(res);
-      
+      await uploadActivity(formData);
       alert("Upload successful");
+      setUploadedFile(null);
+      setSelectedCategory("");
     } catch (err) {
       alert("Upload failed");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white p-6 flex items-center justify-center relative overflow-hidden">
-      {/* Snowflake Effect */}
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-cyan-50 to-white p-6 flex items-center justify-center relative overflow-hidden">
+      {/* Snowflakes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {snowflakes.map((flake) => (
           <div
@@ -118,7 +120,6 @@ const UploadActivity = () => {
               fontSize: `${flake.size}px`,
               opacity: flake.opacity,
               animation: `fall ${flake.animationDuration}s linear ${flake.animationDelay}s infinite`,
-              textShadow: "0 0 5px rgba(255, 255, 255, 0.8)",
             }}
           >
             ❄
@@ -128,60 +129,47 @@ const UploadActivity = () => {
 
       <style>{`
         @keyframes fall {
-          0% {
-            transform: translateY(0) rotate(0deg);
-          }
-          100% {
+          to {
             transform: translateY(100vh) rotate(360deg);
           }
         }
       `}</style>
 
-      <div className="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 relative z-10 border border-blue-100">
-        {/* Frost overlay effect */}
-        <div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle at top right, rgba(191, 219, 254, 0.15), transparent 60%), radial-gradient(circle at bottom left, rgba(165, 243, 252, 0.15), transparent 60%)",
-            boxShadow: "inset 0 0 60px rgba(191, 219, 254, 0.1)",
-          }}
-        />
-
+      <div className="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 relative z-10">
         {/* Header */}
-        <div className="flex justify-between items-start mb-6 relative z-10">
+        <div className="flex justify-between items-start mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
               Upload Carbon Activity Data
             </h1>
             <p className="text-gray-600">
-              Upload department-wise activity data using a standard CSV format.
+              Upload CSV-based activity data for emission calculation
             </p>
           </div>
 
           <button
             onClick={downloadTemplate}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium shadow-md transition-all hover:shadow-lg"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium"
           >
             <Download size={20} />
             Download CSV Template
           </button>
         </div>
 
-        {/* Department */}
-        <div className="mb-6 relative z-10">
+        {/* Category */}
+        <div className="mb-6">
           <label className="block text-gray-700 font-medium mb-2">
-            Select Department <span className="text-red-500">*</span>
+            Select Category <span className="text-red-500">*</span>
           </label>
           <select
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 bg-white"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white"
           >
-            <option value="">Select Department</option>
-            {departments.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
+            <option value="">Select Category</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat.value} value={cat.value}>
+                {cat.label}
               </option>
             ))}
           </select>
@@ -192,7 +180,7 @@ const UploadActivity = () => {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-12 text-center transition-all relative z-10 ${
+          className={`border-2 border-dashed rounded-xl p-12 text-center transition ${
             isDragging
               ? "border-green-500 bg-green-50"
               : "border-gray-300 bg-gray-50"
@@ -207,34 +195,24 @@ const UploadActivity = () => {
           />
 
           <div className="flex flex-col items-center gap-4">
-            <div className="bg-green-100 p-4 rounded-lg">
-              <FileText size={48} className="text-green-600" />
-            </div>
+            <FileText size={48} className="text-green-600" />
 
             {uploadedFile ? (
               <div>
-                <p className="font-semibold text-gray-800">
-                  {uploadedFile.name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {(uploadedFile.size / 1024).toFixed(2)} KB
-                </p>
+                <p className="font-semibold">{uploadedFile.name}</p>
                 <button
                   onClick={() => setUploadedFile(null)}
-                  className="text-red-600 hover:text-red-700 text-sm mt-2 font-medium"
+                  className="text-red-600 text-sm mt-2"
                 >
                   Remove file
                 </button>
               </div>
             ) : (
               <>
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Drag & drop your CSV file
-                </h3>
-                <p className="text-gray-500">or</p>
+                <p className="font-semibold">Drag & drop your CSV file</p>
                 <button
                   onClick={handleBrowseClick}
-                  className="text-green-600 hover:text-green-700 underline font-medium"
+                  className="text-green-600 underline"
                 >
                   Browse from system
                 </button>
@@ -243,15 +221,11 @@ const UploadActivity = () => {
           </div>
         </div>
 
-        <p className="text-center text-sm text-gray-600 mt-4">
-          Accepted format: .csv | Max file size: 5MB
-        </p>
-
         {/* Submit */}
-        <div className="mt-8 flex justify-center relative z-10">
+        <div className="mt-8 flex justify-center">
           <button
             onClick={handleUploadAndProcess}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold text-lg"
           >
             <Upload size={22} />
             Upload & Process Data
