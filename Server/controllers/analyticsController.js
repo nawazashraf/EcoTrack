@@ -46,7 +46,7 @@ exports.getRecommendations = async (req, res) => {
             impact: "High",
             suggestion: "High electricity usage detected (>40%). Switch to LED lighting and install motion sensors."
           });
-        } else if (item._id.toLowerCase().includes('diesel')) {
+        } else if (item._id.toLowerCase().includes('fuel')) {
           recommendations.push({
             category: item._id,
             impact: "Critical",
