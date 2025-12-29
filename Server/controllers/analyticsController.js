@@ -27,6 +27,49 @@ exports.getTrends = async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
 
+exports.getRecommendations = async (req, res) => {
+  try {
+    const data = await ActivityData.aggregate([
+      { $group: { _id: "$category", total: { $sum: "$co2e" } } }
+    ]);
+
+    const totalEmissions = data.reduce((acc, curr) => acc + curr.total, 0);
+    const recommendations = [];
+
+    data.forEach(item => {
+      const percentage = (item.total / totalEmissions) * 100;
+
+      if (percentage > 40) {
+        if (item._id.toLowerCase().includes('electricity')) {
+          recommendations.push({
+            category: item._id,
+            impact: "High",
+            suggestion: "High electricity usage detected (>40%). Switch to LED lighting and install motion sensors."
+          });
+        } else if (item._id.toLowerCase().includes('diesel')) {
+          recommendations.push({
+            category: item._id,
+            impact: "Critical",
+            suggestion: "Diesel consumption is your largest emission source. Consider fleet electrification."
+          });
+        }
+      }
+    });
+
+    if (recommendations.length === 0) {
+      recommendations.push({ 
+        category: "General", 
+        impact: "Low", 
+        suggestion: "Great job! Your emissions are balanced. Continue monitoring." 
+      });
+    }
+
+    res.json(recommendations);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.getPrediction = async (req, res) => {
   try {
     const data = await ActivityData.aggregate([
