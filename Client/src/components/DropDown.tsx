@@ -7,7 +7,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
@@ -27,7 +26,6 @@ type DropdownProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  searchPlaceholder?: string;
   width?: string;
   emptyText?: string;
 };
@@ -37,7 +35,6 @@ const Dropdown = ({
   value,
   onChange,
   placeholder = "Select option...",
-  searchPlaceholder = "Search...",
   width = "w-[200px]",
   emptyText = "No results found.",
 }: DropdownProps) => {
@@ -54,16 +51,23 @@ const Dropdown = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn(width, "justify-between")}
+          className={cn(
+            width,
+            "justify-between bg-white text-black"
+          )}
         >
           {selectedLabel || placeholder}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className={cn(width, "p-0")}>
-        <Command>
-          <CommandInput placeholder={searchPlaceholder} />
+      <PopoverContent
+        className={cn(
+          width,
+          "p-0 bg-white text-black border shadow-md"
+        )}
+      >
+        <Command className="bg-white">
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
 
@@ -72,6 +76,7 @@ const Dropdown = ({
                 <CommandItem
                   key={option.value}
                   value={option.value}
+                  className="cursor-pointer hover:bg-[#26D971]/10 aria-selected:bg-[#26D971]/20"
                   onSelect={(currentValue) => {
                     onChange(currentValue === value ? "" : currentValue);
                     setOpen(false);
