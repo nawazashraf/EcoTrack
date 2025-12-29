@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getEmissionsBySource } from "@/api/getEmissionsBySource.api";
-import EmissionsBySourceChart from "@/components/EmissionsBySourceChart";
-import EmissionsBySourceInsight from "@/components/insights/EmissionsBySourceInsight";
+import EmissionsBySourceChart from "@/components/charts/EmissionsBySourceChart";
+// import EmissionsBySourceInsight from "@/components/insights/EmissionsBySourceInsight";
 import type { EmissionBySource } from "@/types/emissions";
 
 const EmissionBySource = () => {
@@ -32,7 +32,7 @@ const EmissionBySource = () => {
       </h1>
 
       <EmissionsBySourceChart data={data} />
-      <EmissionsBySourceInsight data={data} />
+      {/* <EmissionsBySourceInsight data={data} /> */}
     </div>
   );
 };
