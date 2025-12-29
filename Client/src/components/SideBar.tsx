@@ -13,6 +13,14 @@ import {
   Upload,
 } from "lucide-react";
 import type React from "react";
+import { useEffect, useState } from "react";
+
+type SidebarProps = {
+  collapsed: boolean;
+  setCollapsed: (v: boolean) => void;
+  mobileOpen: boolean;
+  setMobileOpen: (v: boolean) => void;
+};
 
 type SidebarLinkProps = {
   to: string;
@@ -20,120 +28,123 @@ type SidebarLinkProps = {
   label: string;
   collapsed: boolean;
   end?: boolean;
+  onClick?: () => void;
 };
 
-const Sidebar = ({ collapsed, setCollapsed }) => {
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return isMobile;
+};
+
+
+const Sidebar = ({
+  collapsed,
+  setCollapsed,
+  mobileOpen,
+  setMobileOpen,
+}: SidebarProps) => {
+  const isMobile = useIsMobile();
+
+  const isCollapsed = isMobile ? false : collapsed;
+
   return (
     <aside
-      className={`font-inter fixed left-0 top-0 h-screen bg-gray-900 text-white transition-all duration-300  bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
-      ${collapsed ? "w-20 " : "w-64"}`}
+      className={`
+        z-50 h-screen text-white
+        bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
+        transition-all duration-300
+        fixed left-0 top-0
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+        w-64
+        lg:relative lg:translate-x-0
+        ${isCollapsed ? "lg:w-20" : "lg:w-64"}
+      `}
     >
-      {/* SideBar Header*/}
+      {/* Header */}
       <div
         className={`flex items-center border-b border-[#3A6A4C]/40 p-4
-        ${collapsed ? "justify-center" : "justify-between"}`}
+        ${isCollapsed ? "justify-center" : "justify-between"}`}
       >
-        {!collapsed && (
-          <span className="text-lg font-bold flex items-center gap-x-2">
+        {!isCollapsed && (
+          <span className="text-lg font-bold flex items-center gap-2">
             <Leaf size={20} />
             EcoLOGS
           </span>
         )}
 
+        {/* Desktop collapse only */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="rounded p-1 hover:bg-gray-800"
+          className="hidden lg:block rounded p-1 hover:bg-gray-800"
         >
-          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="mt-4 flex flex-col gap-x-1 gap-y-3 px-2">
-        <SidebarLink
-          to="/"
-          icon={<LayoutDashboard size={20} />}
-          label="Dashboard"
-          collapsed={collapsed}
-          end
-        />
-        <SidebarLink
-          to="/emission-by-source"
-          icon={<Factory size={20} />}
-          label="Emissions by Source"
-          collapsed={collapsed}
-        />
-        <SidebarLink
-          to="/emission-trends"
-          icon={<TrendingUp size={20} />}
-          label="Emissions Trends"
-          collapsed={collapsed}
-        />
-        <SidebarLink
-          to="/scope-analysis"
-          icon={<Layers size={20} />}
-          label="GHG Scope Analysis"
-          collapsed={collapsed}
-        />
-        <SidebarLink
-          to="/performance-comparison"
-          icon={<BarChart3 size={20} />}
-          label="Performance Comparison"
-          collapsed={collapsed}
-        />
-        <SidebarLink
-          to="/forecast-and-risk"
-          icon={<Activity size={20} />}
-          label="Forecast & Risk"
-          collapsed={collapsed}
-        />
+      <nav className="mt-4 flex flex-col gap-y-3 px-2">
+        <SidebarLink to="/" icon={<LayoutDashboard size={20} />} label="Dashboard" collapsed={isCollapsed} end onClick={() => setMobileOpen(false)} />
+        <SidebarLink to="/emission-by-source" icon={<Factory size={20} />} label="Emissions by Source" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
+        <SidebarLink to="/emission-trends" icon={<TrendingUp size={20} />} label="Emissions Trends" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
+        <SidebarLink to="/scope-analysis" icon={<Layers size={20} />} label="GHG Scope Analysis" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
+        <SidebarLink to="/performance-comparison" icon={<BarChart3 size={20} />} label="Performance Comparison" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
+        <SidebarLink to="/forecast-and-risk" icon={<Activity size={20} />} label="Forecast & Risk" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
+
         {/* Divider */}
         <div className="my-4 flex items-center gap-3 px-3">
           <div className="h-px flex-1 bg-white/20" />
-
-          {!collapsed && (
+          {!isCollapsed && (
             <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
               Quick Actions
             </span>
           )}
-
           <div className="h-px flex-1 bg-white/20" />
         </div>
-        <SidebarLink
-          to="/add-activity"
-          icon={<Plus size={20} />}
-          label="Add Activity"
-          collapsed={collapsed}
-        />
 
-        <SidebarLink
-          to="/upload-activity"
-          icon={<Upload size={20} />}
-          label="Upload Activity"
-          collapsed={collapsed}
-        />
+        <SidebarLink to="/add-activity" icon={<Plus size={20} />} label="Add Activity" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
+        <SidebarLink to="/upload-activity" icon={<Upload size={20} />} label="Upload Activity" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
       </nav>
     </aside>
   );
 };
 
-const SidebarLink = ({ to, icon, label, collapsed, end }: SidebarLinkProps) => {
+/* ---------- Sidebar Link ---------- */
+
+const SidebarLink = ({
+  to,
+  icon,
+  label,
+  collapsed,
+  end,
+  onClick,
+}: SidebarLinkProps) => {
   return (
     <NavLink
       to={to}
       end={end}
+      onClick={onClick}
       className={({ isActive }) =>
-        `group flex items-center gap-3 rounded px-3 py-2 text-sm transition
+        `relative group flex items-center gap-3 rounded px-3 py-2 text-sm transition
         ${
           isActive
             ? "bg-[#26D971] text-black"
             : "text-gray-300 hover:bg-[#26D971]/20"
-        } ${collapsed && "flex justify-center items-center"}`
+        }
+        ${collapsed ? "justify-center" : ""}`
       }
     >
       {icon}
       {!collapsed && <span>{label}</span>}
-      {/* Tooltip  */}
+
+      {/* Tooltip (desktop collapsed only) */}
       {collapsed && (
         <span className="absolute left-14 z-10 hidden whitespace-nowrap rounded bg-[#1F3A2B] px-2 py-1 text-xs text-white group-hover:block">
           {label}
