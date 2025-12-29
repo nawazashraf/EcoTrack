@@ -1,42 +1,53 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Download, Upload, FileText } from "lucide-react";
 import { uploadActivity } from "@/api/uploadActivity.api";
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const UploadActivity = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [snowflakes, setSnowflakes] = useState<any[]>([]);
 
-  React.useEffect(() => {
-    const flakes = Array.from({ length: 60 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      animationDuration: Math.random() * 4 + 3,
-      animationDelay: Math.random() * 5,
-      size: Math.random() * 12 + 8,
-      opacity: Math.random() * 0.7 + 0.3,
-    }));
-    setSnowflakes(flakes);
+  /* ❄️ Optimized snowflakes (lightweight) */
+  const [snowflakes, setSnowflakes] = useState<number[]>([]);
+
+  useEffect(() => {
+    setSnowflakes(Array.from({ length: 30 }, (_, i) => i));
   }, []);
 
-  /* ---------------- FILE HANDLERS ---------------- */
+  /* ---------------- FILE VALIDATION ---------------- */
+  const validateAndSetFile = (file: File) => {
+    if (!file.name.endsWith(".csv")) {
+      alert("Only CSV files are allowed");
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert("File size must be under 5MB");
+      return;
+    }
+
+    setUploadedFile(file);
+  };
+
+  /* ---------------- EVENT HANDLERS ---------------- */
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
+  const handleDragLeave = () => {
     setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    validateAndSetFile(file);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) validateAndSetFile(file);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,18 +55,11 @@ const UploadActivity = () => {
     if (file) validateAndSetFile(file);
   };
 
-  const validateAndSetFile = (file: File) => {
-    if (file.name.endsWith(".csv") && file.size <= 5 * 1024 * 1024) {
-      setUploadedFile(file);
-    } else {
-      alert("Please upload a valid CSV file (max 5MB)");
-    }
-  };
-
   const handleBrowseClick = () => {
     fileInputRef.current?.click();
   };
 
+  /* ---------------- TEMPLATE DOWNLOAD ---------------- */
   const downloadTemplate = () => {
     const csvContent =
       "Value,Unit,Date,Department\n" +
@@ -67,74 +71,79 @@ const UploadActivity = () => {
       "1500,kg,2024-01-01,Engineering\n";
 
     const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
     a.download = "carbon_activity_template.csv";
     a.click();
 
-    window.URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
   };
 
-  /* ---------------- UPLOAD HANDLER ---------------- */
+  /* ---------------- UPLOAD ---------------- */
   const handleUploadAndProcess = async () => {
-    if (!uploadedFile) {
-      alert("Please upload a CSV file");
-      return;
-    }
+    if (!uploadedFile) return;
 
     const formData = new FormData();
     formData.append("csvFile", uploadedFile);
 
     try {
+      setLoading(true);
       await uploadActivity(formData);
-      alert("Upload successful");
+
+      alert("Upload successful!");
       setUploadedFile(null);
-    } catch (err) {
-      alert("Upload failed");
+    } catch (error) {
+      console.error(error);
+      alert("Upload failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-cyan-50 to-white p-6 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center px-6">
       
       {/* ❄️ Snowflakes */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {snowflakes.map((flake) => (
-          <div
-            key={flake.id}
-            className="absolute"
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {snowflakes.map((i) => (
+          <span
+            key={i}
+            className="snowflake absolute text-white opacity-70"
             style={{
-              left: `${flake.left}%`,
-              top: "-20px",
-              fontSize: `${flake.size}px`,
-              opacity: flake.opacity,
-              animation: `fall ${flake.animationDuration}s linear ${flake.animationDelay}s infinite`,
+              left: `${Math.random() * 100}%`,
+              animationDuration: `${8 + Math.random() * 6}s`,
+              animationDelay: `${Math.random() * 5}s`,
             }}
           >
             ❄
-          </div>
+          </span>
         ))}
       </div>
 
       <style>{`
-        @keyframes fall {
+        .snowflake {
+          top: -10%;
+          font-size: 14px;
+          animation: snowfall linear infinite;
+        }
+        @keyframes snowfall {
           to {
-            transform: translateY(100vh) rotate(360deg);
+            transform: translateY(120vh) rotate(360deg);
           }
         }
       `}</style>
 
-      <div className="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 relative z-10">
+      <div className="relative z-10 w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8">
         
         {/* Header */}
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            <h1 className="text-3xl font-bold text-gray-800">
               Upload Carbon Activity Data
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mt-1">
               Upload CSV-based activity data for emission calculation
             </p>
           </div>
@@ -198,10 +207,11 @@ const UploadActivity = () => {
         <div className="mt-8 flex justify-center">
           <button
             onClick={handleUploadAndProcess}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold text-lg"
+            disabled={!uploadedFile || loading}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold text-lg disabled:opacity-50"
           >
             <Upload size={22} />
-            Upload & Process Data
+            {loading ? "Uploading..." : "Upload & Process Data"}
           </button>
         </div>
       </div>
