@@ -1,12 +1,9 @@
 import React, { useState, useRef } from "react";
 import { Download, Upload, FileText } from "lucide-react";
 import { uploadActivity } from "@/api/uploadActivity.api";
-import { CATEGORIES } from "@/constants/activity.constants";
 
-//TODO Remove Category Input field
 
 const UploadActivity = () => {
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -38,7 +35,6 @@ const UploadActivity = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-
     const file = e.dataTransfer.files[0];
     validateAndSetFile(file);
   };
@@ -62,13 +58,13 @@ const UploadActivity = () => {
 
   const downloadTemplate = () => {
     const csvContent =
-      "Category,Value,Unit,Date,Department\n" +
-      "electricity,1200,kWh,2024-01-01,Operations\n" +
-      "electricity,3500,kWh,2024-01-02,Engineering\n" +
-      "transportation,120,liters,2024-01-01,Logistics\n" +
-      "transportation,260,liters,2024-01-02,Logistics\n" +
-      "waste,350,kg,2024-01-01,Admin\n" +
-      "manufacturing,1500,kg,2024-01-01,Engineering\n";
+      "Value,Unit,Date,Department\n" +
+      "1200,kWh,2024-01-01,Operations\n" +
+      "3500,kWh,2024-01-02,Engineering\n" +
+      "120,liters,2024-01-01,Logistics\n" +
+      "260,liters,2024-01-02,Logistics\n" +
+      "350,kg,2024-01-01,Admin\n" +
+      "1500,kg,2024-01-01,Engineering\n";
 
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -81,13 +77,8 @@ const UploadActivity = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  /* Handling Uploading CSV File */
+  /* ---------------- UPLOAD HANDLER ---------------- */
   const handleUploadAndProcess = async () => {
-    if (!selectedCategory) {
-      alert("Please select a category");
-      return;
-    }
-
     if (!uploadedFile) {
       alert("Please upload a CSV file");
       return;
@@ -100,7 +91,6 @@ const UploadActivity = () => {
       await uploadActivity(formData);
       alert("Upload successful");
       setUploadedFile(null);
-      setSelectedCategory("");
     } catch (err) {
       alert("Upload failed");
     }
@@ -108,7 +98,8 @@ const UploadActivity = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-cyan-50 to-white p-6 flex items-center justify-center relative overflow-hidden">
-      {/* Snowflakes */}
+      
+      {/* ❄️ Snowflakes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {snowflakes.map((flake) => (
           <div
@@ -136,6 +127,7 @@ const UploadActivity = () => {
       `}</style>
 
       <div className="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 relative z-10">
+        
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -154,25 +146,6 @@ const UploadActivity = () => {
             <Download size={20} />
             Download CSV Template
           </button>
-        </div>
-
-        {/* Category */}
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">
-            Select Category <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white"
-          >
-            <option value="">Select Category</option>
-            {CATEGORIES.map((cat) => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Upload Area */}
