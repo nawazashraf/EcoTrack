@@ -107,3 +107,46 @@ exports.getPrediction = async (req, res) => {
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
+
+exports.getComparison = async (req, res) => {
+  try {
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1;
+    const currentYear = today.getFullYear();
+    
+    let prevMonth = currentMonth - 1;
+    let prevYear = currentYear;
+    if (prevMonth === 0) { prevMonth = 12; prevYear = currentYear - 1; }
+
+    const data = await ActivityData.aggregate([
+      {
+        $project: { year: { $year: "$date" }, month: { $month: "$date" }, co2e: 1 }
+      },
+      {
+        $match: {
+          $or: [
+            { year: currentYear, month: currentMonth },
+            { year: prevYear, month: prevMonth }
+          ]
+        }
+      },
+      {
+        $group: {
+          _id: { year: "$year", month: "$month" },
+          total: { $sum: "$co2e" }
+        }
+      }
+    ]);
+
+    const current = data.find(d => d._id.month === currentMonth)?.total || 0;
+    const previous = data.find(d => d._id.month === prevMonth)?.total || 0;
+    const change = current - previous;
+
+    res.json({
+      currentPeriod: { value: current.toFixed(2) },
+      previousPeriod: { value: previous.toFixed(2) },
+      change: change.toFixed(2),
+      trend: change < 0 ? "Decreasing" : "Increasing"
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+};
