@@ -14,17 +14,17 @@ const GHGScopeInsightCards = ({ overview }: { overview: AnalyticsOverview }) => 
       ? "Optimize electricity consumption"
       : topScope._id === "Scope 1"
       ? "Reduce direct fuel usage"
-      : "Engage suppliers & logistics partners";
+      : "Engage suppliers and logistics partners";
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="space-y-4">
       
       {/* Dominant Scope */}
-      <div className="bg-white rounded-xl shadow p-4">
+      <div className="bg-gray-50 rounded-xl p-4 border">
         <p className="text-xs text-gray-500 uppercase tracking-wide">
           Dominant Scope
         </p>
-        <h3 className="text-xl font-semibold mt-1 text-gray-900">
+        <h3 className="text-xl font-semibold text-gray-900 mt-1">
           {topScope._id}
         </h3>
         <p className="text-sm text-gray-600 mt-1">
@@ -33,11 +33,11 @@ const GHGScopeInsightCards = ({ overview }: { overview: AnalyticsOverview }) => 
       </div>
 
       {/* Emission Share */}
-      <div className="bg-white rounded-xl shadow p-4">
+      <div className="bg-gray-50 rounded-xl p-4 border">
         <p className="text-xs text-gray-500 uppercase tracking-wide">
           Emission Share
         </p>
-        <h3 className="text-xl font-semibold mt-1 text-gray-900">
+        <h3 className="text-xl font-semibold text-gray-900 mt-1">
           {percentage}%
         </h3>
         <p className="text-sm text-gray-600 mt-1">
@@ -46,11 +46,11 @@ const GHGScopeInsightCards = ({ overview }: { overview: AnalyticsOverview }) => 
       </div>
 
       {/* Action Priority */}
-      <div className="bg-white rounded-xl shadow p-4">
+      <div className="bg-gray-50 rounded-xl p-4 border">
         <p className="text-xs text-gray-500 uppercase tracking-wide">
           Action Priority
         </p>
-        <h3 className="text-base font-semibold mt-1 text-gray-900">
+        <h3 className="text-base font-semibold text-gray-900 mt-1">
           {priority}
         </h3>
         <p className="text-sm text-gray-600 mt-1">

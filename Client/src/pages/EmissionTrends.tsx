@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getTrends } from "@/api/getTrends.api";
-import EmissionTrendsChart from "@/components/EmissionTrendsChart";
+import EmissionTrendsChart from "@/components/charts/EmissionTrendsChart";
 
 const EmissionTrends = () => {
   const [data, setData] = useState<any[]>([]);
