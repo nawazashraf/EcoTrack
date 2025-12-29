@@ -16,6 +16,7 @@ app.use('/api/analytics', require('./routes/analyticsRoutes'));
 
 const EmissionFactor = require('./models/EmissionFactor');
 
+
 app.get('/api/seed', async (req, res) => {
   try {
     await EmissionFactor.deleteMany({});

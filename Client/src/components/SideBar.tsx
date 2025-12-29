@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
-
   ChevronLeft,
   ChevronRight,
   Factory,
@@ -10,20 +9,36 @@ import {
   BarChart3,
   Activity,
   Leaf,
+  Plus,
+  Upload,
 } from "lucide-react";
+import type React from "react";
+
+type SidebarLinkProps = {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  collapsed: boolean;
+  end?: boolean;
+};
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-gray-900 text-white transition-all duration-300  bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
+      className={`font-inter fixed left-0 top-0 h-screen bg-gray-900 text-white transition-all duration-300  bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
       ${collapsed ? "w-20 " : "w-64"}`}
     >
       {/* SideBar Header*/}
       <div
-        className={`flex items-center border-b border-gray-800 p-4
+        className={`flex items-center border-b border-[#3A6A4C]/40 p-4
         ${collapsed ? "justify-center" : "justify-between"}`}
       >
-        {!collapsed && <span className="text-lg font-bold flex items-center gap-x-2"><Leaf size={20}/>EcoLOGS</span>}
+        {!collapsed && (
+          <span className="text-lg font-bold flex items-center gap-x-2">
+            <Leaf size={20} />
+            EcoLOGS
+          </span>
+        )}
 
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -40,6 +55,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
           icon={<LayoutDashboard size={20} />}
           label="Dashboard"
           collapsed={collapsed}
+          end
         />
         <SidebarLink
           to="/emission-by-source"
@@ -71,16 +87,41 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
           label="Forecast & Risk"
           collapsed={collapsed}
         />
+        {/* Divider */}
+        <div className="my-4 flex items-center gap-3 px-3">
+          <div className="h-px flex-1 bg-white/20" />
+
+          {!collapsed && (
+            <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
+              Quick Actions
+            </span>
+          )}
+
+          <div className="h-px flex-1 bg-white/20" />
+        </div>
+        <SidebarLink
+          to="/add-activity"
+          icon={<Plus size={20} />}
+          label="Add Activity"
+          collapsed={collapsed}
+        />
+
+        <SidebarLink
+          to="/upload-activity"
+          icon={<Upload size={20} />}
+          label="Upload Activity"
+          collapsed={collapsed}
+        />
       </nav>
     </aside>
   );
 };
 
-const SidebarLink = ({ to, icon, label, collapsed }) => {
+const SidebarLink = ({ to, icon, label, collapsed, end }: SidebarLinkProps) => {
   return (
     <NavLink
       to={to}
-      end
+      end={end}
       className={({ isActive }) =>
         `group flex items-center gap-3 rounded px-3 py-2 text-sm transition
         ${
@@ -92,9 +133,9 @@ const SidebarLink = ({ to, icon, label, collapsed }) => {
     >
       {icon}
       {!collapsed && <span>{label}</span>}
-      {/* Tooltip (shadcn-style) */}
+      {/* Tooltip  */}
       {collapsed && (
-        <span className="absolute left-14 z-10 hidden whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white group-hover:block">
+        <span className="absolute left-14 z-10 hidden whitespace-nowrap rounded bg-[#1F3A2B] px-2 py-1 text-xs text-white group-hover:block">
           {label}
         </span>
       )}
