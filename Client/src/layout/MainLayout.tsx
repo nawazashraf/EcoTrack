@@ -1,12 +1,22 @@
-import { Outlet } from "react-router-dom"
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../components/SideBar";
 
 const MainLayout = () => {
-  return (
-    <div>
-        <h1>Main Layout</h1>
-        <Outlet />
-    </div>
-  )
-}
+  const [collapsed, setCollapsed] = useState(false);
 
-export default MainLayout
+  return (
+    <div className="flex">
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+
+      <main
+        className={`min-h-screen w-full bg-gray-100 p-6 transition-all duration-300
+        ${collapsed ? "ml-20" : "ml-64"}`}
+      >
+        <Outlet />
+      </main>
+    </div>
+  );
+};
+
+export default MainLayout;
