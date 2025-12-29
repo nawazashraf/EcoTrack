@@ -1,72 +1,99 @@
 const ActivityData = require('../models/ActivityData');
-const calculateEmission = require('../utils/calculate');
-const fs = require('fs');
 const csv = require('csv-parser');
+const fs = require('fs');
 
-exports.addActivity = async (req, res) => {
+// 1. The "Bulletproof" Upload Function
+exports.uploadActivity = async (req, res) => {
   try {
-    const { category, value, unit, date, department } = req.body;
-    const { co2e, scope } = await calculateEmission(category, value);
-    const newActivity = await ActivityData.create({
-      user: req.user.id, 
-      department: department || "General",
-      category, value, unit, date, co2e, scope,
-      source: 'Manual'
-    });
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
 
-    res.status(201).json(newActivity);
+    const results = [];
+    const filePath = req.file.path;
+
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (data) => {
+        // Clean Keys (Handle BOM and whitespace)
+        const cleanRow = {};
+        Object.keys(data).forEach(key => {
+          const cleanKey = key.trim().toLowerCase().replace(/^\ufeff/, '');
+          cleanRow[cleanKey] = data[key];
+        });
+        results.push(cleanRow);
+      })
+      .on('end', async () => {
+        try {
+          const activities = results.map(row => {
+            if (!row.category || !row.value) return null;
+
+            // Scope Logic
+            let scope = "Scope 3";
+            const cat = row.category.toLowerCase();
+            if (['fuel', 'refrigerants', 'combustion'].some(x => cat.includes(x))) scope = "Scope 1";
+            if (['electricity', 'heating', 'cooling'].some(x => cat.includes(x))) scope = "Scope 2";
+
+            return {
+              category: row.category,
+              value: parseFloat(row.value),
+              unit: row.unit || "kg",
+              date: row.date ? new Date(row.date) : new Date(),
+              department: row.department || "General",
+              scope: scope,
+              co2e: (parseFloat(row.value) * 0.5) // Demo calculation
+            };
+          }).filter(item => item !== null);
+
+          if (activities.length > 0) {
+            await ActivityData.insertMany(activities);
+            fs.unlinkSync(filePath); // Delete temp file
+            res.status(200).json({ message: `Processed ${activities.length} records successfully` });
+          } else {
+            res.status(200).json({ message: "Processed 0 records. Check CSV headers." });
+          }
+        } catch (err) {
+          res.status(500).json({ error: err.message });
+        }
+      });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-exports.uploadCSV = async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+// 2. The Add Activity Function (Manual Entry)
+exports.addActivity = async (req, res) => {
+  try {
+    const { category, value, unit, date, department } = req.body;
+    
+    // Scope Logic
+    let scope = "Scope 3";
+    const cat = category.toLowerCase();
+    if (['fuel', 'refrigerants'].some(x => cat.includes(x))) scope = "Scope 1";
+    if (['electricity', 'heating'].some(x => cat.includes(x))) scope = "Scope 2";
 
-  const results = [];
-  const batchId = Date.now().toString();
-  fs.createReadStream(req.file.path)
-    .pipe(csv())
-    .on('data', (data) => results.push(data))
-    .on('end', async () => {
-      try {
-        let count = 0;
-        for (const row of results) {
-          if (row.Category && row.Value) {
-            const val = parseFloat(row.Value);
-            const { co2e, scope } = await calculateEmission(row.Category, val);
-
-            await ActivityData.create({
-              user: req.user.id,
-              department: row.Department || "General",
-              category: row.Category,
-              value: val,
-              unit: row.Unit || 'unit',
-              date: new Date(row.Date),
-              source: 'CSV',
-              batchId, co2e, scope
-            });
-            count++;
-          }
-        }
-        fs.unlinkSync(req.file.path);
-        res.status(200).json({ message: `Processed ${count} records`, batchId });
-      } catch (error) {
-        res.status(500).json({ error: "CSV Error" });
-      }
+    const newActivity = new ActivityData({
+      category,
+      value,
+      unit,
+      date,
+      department,
+      scope,
+      co2e: value * 0.5 // Simplified
     });
+
+    await newActivity.save();
+    res.status(201).json(newActivity);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-exports.deleteActivity = async (req, res) => {
+// 3. The Delete All Function (For Cleanup)
+exports.deleteAllActivities = async (req, res) => {
   try {
-    const activity = await ActivityData.findById(req.params.id);
-
-    if (!activity) {
-      return res.status(404).json({ error: "Activity not found" });
-    }
-
-    await activity.deleteOne();
-    res.json({ message: "Activity removed" });
+    await ActivityData.deleteMany({});
+    res.status(200).json({ message: "All records deleted." });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
