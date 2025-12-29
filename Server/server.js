@@ -13,6 +13,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes'));
 
 const EmissionFactor = require('./models/EmissionFactor');
 
