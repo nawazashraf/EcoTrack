@@ -9,11 +9,9 @@ import {
 } from "recharts";
 
 type TrendItem = {
-  _id: {
-    year: number;
-    month: number;
-  };
-  total: number;
+  year: number;
+  month: number;
+  totalCO2e: number;
 };
 
 type Props = {
@@ -27,8 +25,8 @@ const monthNames = [
 
 const EmissionTrendsChart = ({ data }: Props) => {
   const chartData = data.map((item) => ({
-    month: `${monthNames[item._id.month - 1]} ${item._id.year}`,
-    emissions: Number(item.total.toFixed(2)),
+    month: `${monthNames[item.month - 1]} ${item.year}`,
+    emissions: Number(item.totalCO2e.toFixed(2)),
   }));
 
   return (
