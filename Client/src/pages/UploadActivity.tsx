@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Download, Upload, FileText } from "lucide-react";
+import { uploadActivity } from "@/api/uploadActivity.api";
 
 const UploadActivity = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -15,17 +16,12 @@ const UploadActivity = () => {
       animationDuration: Math.random() * 4 + 3,
       animationDelay: Math.random() * 5,
       size: Math.random() * 12 + 8, // Bigger snowflakes: 8-20px
-      opacity: Math.random() * 0.7 + 0.3
+      opacity: Math.random() * 0.7 + 0.3,
     }));
     setSnowflakes(flakes);
   }, []);
 
-  const departments = [
-    "Electricity",
-    "Transport",
-    "Waste",
-    "MAnufacturing",
-  ];
+  const departments = ["Electricity", "Transport", "Waste", "Manufacturing"];
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -63,50 +59,48 @@ const UploadActivity = () => {
   };
 
   const downloadTemplate = () => {
-  const csvContent =
-    "Department,Activity Type,Date,Quantity,Unit,Notes\n" +
+    const csvContent =
+      "Category,Value,Unit,Date,Department\n" +
+      // ================= ELECTRICITY =================
+      "Electricity,1200,kWh,2024-01-01,Electricity\n" +
+      "Electricity,3500,kWh,2024-01-02,Electricity\n" +
+      // ================= TRANSPORT =================
+      "Transport,120,liters,2024-01-01,Transport\n" +
+      "Transport,260,liters,2024-01-02,Transport\n" +
+      // ================= WASTE =================
+      "Waste,350,kg,2024-01-01,Waste\n" +
+      "Waste,180,kg,2024-01-02,Waste\n" +
+      // ================= MANUFACTURING =================
+      "Manufacturing,1500,kg,2024-01-01,Manufacturing\n" +
+      "Manufacturing,4200,kWh,2024-01-02,Manufacturing\n";
 
-    // ================= ELECTRICITY =================
-    "Electricity,Office Electricity Usage,2024-01-01,1200,kWh,Main office meter\n" +
-    "Electricity,Data Center Power,2024-01-02,3500,kWh,Server room usage\n" +
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
 
-    // ================= TRANSPORT =================
-    "Transport,Company Car Petrol,2024-01-01,120,Liters,Sales travel\n" +
-    "Transport,Delivery Van Diesel,2024-01-02,260,Liters,Logistics\n" +
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "carbon_activity_template.csv";
+    a.click();
 
-    // ================= WASTE =================
-    "Waste,Organic Waste Disposal,2024-01-01,350,kg,Cafeteria waste\n" +
-    "Waste,Plastic Waste Recycling,2024-01-02,180,kg,Recyclables\n" +
+    window.URL.revokeObjectURL(url);
+  };
 
-    // ================= MANUFACTURING =================
-    "Manufacturing,Raw Material Processing,2024-01-01,1500,kg,Steel processing\n" +
-    "Manufacturing,Machine Operation,2024-01-02,4200,kWh,CNC machines\n";
-
-  const blob = new Blob([csvContent], { type: "text/csv" });
-  const url = window.URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "carbon_activity_template.csv";
-  a.click();
-
-  window.URL.revokeObjectURL(url);
-};
-
-
-  const handleUploadAndProcess = () => {
-    if (!selectedDepartment) {
-      alert("Please select a department");
-      return;
-    }
+  const handleUploadAndProcess = async () => {
     if (!uploadedFile) {
       alert("Please upload a CSV file");
       return;
     }
 
-    alert(
-      `Processing data for ${selectedDepartment} department\nFile: ${uploadedFile.name}`
-    );
+    const formData = new FormData();
+    formData.append("csvFile", uploadedFile);
+
+    try {
+      const res = await uploadActivity(formData);
+
+      alert("Upload successful");
+    } catch (err) {
+      alert("Upload failed");
+    }
   };
 
   return (
@@ -119,18 +113,18 @@ const UploadActivity = () => {
             className="absolute"
             style={{
               left: `${flake.left}%`,
-              top: '-20px',
+              top: "-20px",
               fontSize: `${flake.size}px`,
               opacity: flake.opacity,
               animation: `fall ${flake.animationDuration}s linear ${flake.animationDelay}s infinite`,
-              textShadow: '0 0 5px rgba(255, 255, 255, 0.8)'
+              textShadow: "0 0 5px rgba(255, 255, 255, 0.8)",
             }}
           >
             ❄
           </div>
         ))}
       </div>
-      
+
       <style>{`
         @keyframes fall {
           0% {
@@ -144,14 +138,15 @@ const UploadActivity = () => {
 
       <div className="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 relative z-10 border border-blue-100">
         {/* Frost overlay effect */}
-        <div 
-          className="absolute inset-0 rounded-2xl pointer-events-none" 
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at top right, rgba(191, 219, 254, 0.15), transparent 60%), radial-gradient(circle at bottom left, rgba(165, 243, 252, 0.15), transparent 60%)',
-            boxShadow: 'inset 0 0 60px rgba(191, 219, 254, 0.1)'
+            background:
+              "radial-gradient(circle at top right, rgba(191, 219, 254, 0.15), transparent 60%), radial-gradient(circle at bottom left, rgba(165, 243, 252, 0.15), transparent 60%)",
+            boxShadow: "inset 0 0 60px rgba(191, 219, 254, 0.1)",
           }}
         />
-        
+
         {/* Header */}
         <div className="flex justify-between items-start mb-6 relative z-10">
           <div>
@@ -217,7 +212,9 @@ const UploadActivity = () => {
 
             {uploadedFile ? (
               <div>
-                <p className="font-semibold text-gray-800">{uploadedFile.name}</p>
+                <p className="font-semibold text-gray-800">
+                  {uploadedFile.name}
+                </p>
                 <p className="text-sm text-gray-600">
                   {(uploadedFile.size / 1024).toFixed(2)} KB
                 </p>
