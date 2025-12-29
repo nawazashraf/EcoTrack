@@ -10,7 +10,7 @@ const MainLayout = () => {
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
       <main
-        className={`min-h-screen w-full bg-gray-100 p-6 transition-all duration-300
+        className={`min-h-screen w-full bg-gray-100 transition-all duration-300
         ${collapsed ? "ml-20" : "ml-64"}`}
       >
         <Outlet />
