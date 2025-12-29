@@ -27,13 +27,12 @@ const EmissionsBySourceChart = ({ data }: { data: EmissionBySource[] }) => {
         </p>
       </div>
 
-      {/* 🔥 CRITICAL CHANGE: aspect instead of height */}
-      <div className="relative w-full">
-        <ResponsiveContainer width="100%" aspect={1}>
+      <div className="relative w-full  h-[300px] sm:h-[340px] lg:h-[250px]">
+        <ResponsiveContainer width="100%" height={"100%"}>
           <PieChart>
             <Pie
               data={data}
-              dataKey="totalCO2e"   // absolute value
+              dataKey="totalCO2e" 
               nameKey="category"
               cx="50%"
               cy="50%"
