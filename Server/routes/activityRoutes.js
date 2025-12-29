@@ -11,5 +11,6 @@ const mockAuth = (req, res, next) => {
 
 router.post('/', mockAuth,upload.none(), addActivity);
 router.post('/upload', mockAuth, upload.single('csvFile'), uploadCSV);
+router.delete('/:id', mockAuth, deleteActivity);
 
 module.exports = router;

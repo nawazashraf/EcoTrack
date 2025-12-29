@@ -56,3 +56,18 @@ exports.uploadCSV = async (req, res) => {
       }
     });
 };
+
+exports.deleteActivity = async (req, res) => {
+  try {
+    const activity = await ActivityData.findById(req.params.id);
+
+    if (!activity) {
+      return res.status(404).json({ error: "Activity not found" });
+    }
+
+    await activity.deleteOne();
+    res.json({ message: "Activity removed" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
