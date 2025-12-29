@@ -19,7 +19,7 @@ const EmissionsBySourceKpis = ({
   const lowest = sorted[sorted.length - 1];
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 h-full flex flex-col gap-2">
+    <div className="rounded-2xl border border-gray-100 p-3 h-full flex flex-col gap-x-2 gap-y-4">
       <KpiCard
         title="Total Emissions"
         value={`${total.toLocaleString()} kg`}

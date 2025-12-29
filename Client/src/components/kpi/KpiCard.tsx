@@ -8,7 +8,7 @@ type KpiCardProps = {
 
 const KpiCard = ({ title, value, subtitle }: KpiCardProps) => {
   return (
-    <div className="border border-gray-100 rounded-lg px-4 py-3">
+    <div className="bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-sm">
       <p className="text-xs text-gray-500 mb-1">
         {title}
       </p>
