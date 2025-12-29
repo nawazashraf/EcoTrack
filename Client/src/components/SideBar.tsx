@@ -15,7 +15,7 @@ import {
 const Sidebar = ({ collapsed, setCollapsed }) => {
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-gray-900 text-white transition-all duration-300  bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
+      className={`font-inter fixed left-0 top-0 h-screen bg-gray-900 text-white transition-all duration-300  bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
       ${collapsed ? "w-20 " : "w-64"}`}
     >
       {/* SideBar Header*/}
