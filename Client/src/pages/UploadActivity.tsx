@@ -96,7 +96,8 @@ const UploadActivity = () => {
 
     try {
       const res = await uploadActivity(formData);
-
+      console.log(res);
+      
       alert("Upload successful");
     } catch (err) {
       alert("Upload failed");
