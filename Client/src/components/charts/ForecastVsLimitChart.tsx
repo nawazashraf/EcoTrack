@@ -20,16 +20,24 @@ const ForecastVsLimitChart = ({ forecastValue, unit, safeLimit }: Props) => {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow p-5 h-full">
-      <h3 className="text-md font-semibold mb-3">
-        Forecast vs Safe Limit ({unit})
+    <div className="rounded-xl p-3 h-full">
+      <h3 className="text-sm font-semibold mb-2 text-gray-800">
+        Forecast vs Safe Limit
+        <span className="text-xs text-gray-500 ml-1">({unit})</span>
       </h3>
 
-      <div className="h-56">
+      <div
+        className="
+          w-full
+          h-[160px]
+          sm:h-[180px]
+          lg:h-[200px]
+        "
+      >
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} barGap={30}>
-            <XAxis dataKey="name" />
-            <YAxis />
+          <BarChart data={data} barGap={24}>
+            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
             <Bar
               dataKey="value"

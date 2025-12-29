@@ -1,9 +1,4 @@
-import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 type Props = {
   category: string;
@@ -12,8 +7,7 @@ type Props = {
 };
 
 const RiskDominanceChart = ({ category, impact, suggestion }: Props) => {
-  const riskScore =
-    impact === "Critical" ? 80 : impact === "High" ? 60 : 30;
+  const riskScore = impact === "Critical" ? 80 : impact === "High" ? 60 : 30;
 
   const data = [
     { name: category, value: riskScore },
@@ -28,30 +22,46 @@ const RiskDominanceChart = ({ category, impact, suggestion }: Props) => {
       : "#22C55E";
 
   return (
-    <div className="bg-white rounded-xl shadow p-5 h-full">
-      <h3 className="text-md font-semibold mb-3">Risk Dominance</h3>
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <h3 className="text-sm font-semibold text-gray-800 mb-2">
+        Risk Dominance
+      </h3>
 
-      <div className="flex flex-col items-center">
-        <div className="h-56 w-56">
-          <ResponsiveContainer>
-            <PieChart>
-              <Pie
-                data={data}
-                dataKey="value"
-                innerRadius={60}
-                outerRadius={90}
-              >
-                <Cell fill={color} />
-                <Cell fill="#E5E7EB" />
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
+      {/* Chart */}
+      <div className="flex-1 relative">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              startAngle={90}
+              endAngle={-270}
+              innerRadius="40%"
+              outerRadius="85%"
+              paddingAngle={2}
+              stroke="#ffffff"
+              strokeWidth={2}
+            >
+              <Cell fill={color} />
+              <Cell fill="#CBD5E1" />
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+
+        {/* Center Label */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <p className="text-3xl font-bold text-gray-900">{riskScore}%</p>
+          <p className="text-xs text-gray-500">Risk Share</p>
         </div>
+      </div>
 
-        <p className="mt-2 text-sm font-semibold capitalize">{category}</p>
+      {/* Footer */}
+      <div className="pt-3 text-center">
+        <p className="text-sm font-semibold capitalize">{category}</p>
 
         <span
-          className={`mt-1 px-3 py-1 text-xs rounded-full ${
+          className={`inline-block mt-1 px-3 py-1 text-xs rounded-full ${
             impact === "Critical"
               ? "bg-red-100 text-red-700"
               : impact === "High"
@@ -62,7 +72,7 @@ const RiskDominanceChart = ({ category, impact, suggestion }: Props) => {
           {impact} Impact
         </span>
 
-        <p className="mt-3 text-sm text-gray-600 text-center">
+        <p className="mt-2 text-xs text-gray-600 max-w-xs mx-auto">
           {suggestion}
         </p>
       </div>
