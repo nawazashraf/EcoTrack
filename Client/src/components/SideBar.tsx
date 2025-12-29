@@ -58,7 +58,7 @@ const Sidebar = ({
   return (
     <aside
       className={`
-        z-50 h-screen text-white
+        z-50 min-h-screen text-white
         bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
         transition-all duration-300
         fixed left-0 top-0
