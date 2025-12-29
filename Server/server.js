@@ -3,30 +3,64 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-// Connect to Database
 connectDB();
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 
-// Seed Emission Factors Route (Run once to populate DB)
 const EmissionFactor = require('./models/EmissionFactor');
+
 app.get('/api/seed', async (req, res) => {
-  await EmissionFactor.deleteMany({});
-  await EmissionFactor.insertMany([
-    { category: "electricity", factor: 0.82, unit: "kgCO2e/kWh" },
-    { category: "diesel", factor: 2.68, unit: "kgCO2e/liter" },
-    { category: "petrol", factor: 2.31, unit: "kgCO2e/liter" }
-  ]);
-  res.send("Emission Factors Seeded!");
+  try {
+    await EmissionFactor.deleteMany({});
+
+    await EmissionFactor.insertMany([
+      { 
+        category: "electricity", 
+        factor: 0.82, 
+        unit: "kgCO2e/kWh", 
+        source: "CEA 2024" 
+      },
+      
+      { 
+        category: "fuel", 
+        factor: 2.50, 
+        unit: "kgCO2e/liter", 
+        source: "EPA Average" 
+      },
+
+      { 
+        category: "transportation", 
+        factor: 0.14, 
+        unit: "kgCO2e/km", 
+        source: "DEFRA" 
+      },
+      
+      { 
+        category: "waste", 
+        factor: 0.57, 
+        unit: "kgCO2e/kg", 
+        source: "IPCC" 
+      },
+
+      { 
+        category: "manufacturing", 
+        factor: 0.80, 
+        unit: "kgCO2e/kg", 
+        source: "Industry Avg" 
+      }
+    ]);
+
+    res.send("Emission Factors Seeded Successfully! (Fuel, Electricity, Transport, Waste, Manufacturing)");
+  } catch (err) {
+    res.status(500).send("Seeding Failed: " + err.message);
+  }
 });
 
 const PORT = process.env.PORT || 5000;
