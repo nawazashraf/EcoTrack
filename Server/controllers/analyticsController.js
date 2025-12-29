@@ -50,7 +50,7 @@ exports.getRecommendations = async (req, res) => {
           recommendations.push({
             category: item._id,
             impact: "Critical",
-            suggestion: "Diesel consumption is your largest emission source. Consider fleet electrification."
+            suggestion: "Fuel consumption is your largest emission source. Consider fleet electrification."
           });
         }
       }
@@ -149,4 +149,32 @@ exports.getComparison = async (req, res) => {
       trend: change < 0 ? "Decreasing" : "Increasing"
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
+};
+
+exports.getEmissionBySource = async (req, res) => {
+  try {
+    const data = await ActivityData.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          totalCO2e: { $sum: "$co2e" }
+        }
+      },
+      {
+        $sort: { totalCO2e: -1 }
+      }
+    ]);
+
+    const grandTotal = data.reduce((acc, curr) => acc + curr.totalCO2e, 0);
+
+    const response = data.map(item => ({
+      category: item._id.charAt(0).toUpperCase() + item._id.slice(1),
+      totalCO2e: parseFloat(item.totalCO2e.toFixed(2)),
+      percentage: grandTotal > 0 ? parseFloat(((item.totalCO2e / grandTotal) * 100).toFixed(2)) : 0
+    }));
+
+    res.json(response);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
