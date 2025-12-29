@@ -1,6 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthLayout from "./layout/AuthLayout";
 import LogIn from "./pages/LogIn";
+import Onboarding from "./pages/Onboarding";
+
 import MainLayout from "./layout/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import EmissionBySource from "./pages/EmissionBySource";
@@ -13,16 +15,20 @@ import UploadActivity from "./pages/UploadActivity";
 
 function App() {
   const router = createBrowserRouter([
-    // {
-    //   path: "/",
-    //   element: <AuthLayout />,
-    //   children: [
-    //     {
-    //       path: "login",
-    //       element: <LogIn />,
-    //     },
-    //   ],
-    // },
+    {
+      path: "/",
+      element: <AuthLayout />,
+      children: [
+        {
+          path: "login",
+          element: <LogIn />,
+        },
+        {
+          path: "onboarding",
+          element: <Onboarding/>
+        }
+      ],
+    },
     {
       path: "/",
       element: <MainLayout />,

@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import React from "react";
 
-const LogIn = () => {
+const Onboarding = () => {
+  const [department, setDepartment] = useState("");
   const [snowflakes, setSnowflakes] = useState([]);
 
   React.useEffect(() => {
@@ -15,13 +17,12 @@ const LogIn = () => {
     setSnowflakes(flakes);
   }, []);
 
-  const handleLogin = () => {
-    alert("Navigating to onboarding page...");
+  const handleContinue = () => {
+    alert(`Navigating to upload page with department: ${department}`);
   };
 
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 relative overflow-hidden">
-      
       {/* Snowflake Effect */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
         {snowflakes.map((flake) => (
@@ -52,18 +53,18 @@ const LogIn = () => {
           }
         }
       `}</style>
-
-      {/* LEFT SIDE – POSTER (50%) */}
-      <div className="hidden md:flex bg-gradient-to-br from-emerald-700 to-green-900 text-white items-center justify-center p-10 relative">
+      
+      {/* LEFT 50% INFO */}
+      <div className="hidden md:flex bg-emerald-800 text-white items-center justify-center p-10 relative">
         <div className="relative z-10">
-          <h1 className="text-4xl font-bold mb-3">EcoTrack</h1>
-          <p className="text-lg opacity-90 max-w-md">
-            Track, analyze, and reduce your carbon footprint with confidence.
+          <h1 className="text-4xl font-bold mb-3">Get Started</h1>
+          <p className="opacity-90">
+            Select your department to continue carbon tracking.
           </p>
         </div>
       </div>
 
-      {/* RIGHT SIDE – LOGIN FORM (50%) */}
+      {/* RIGHT 50% FORM */}
       <div className="flex items-center justify-center bg-gradient-to-br from-blue-50 via-cyan-50 to-white relative">
         {/* Frost overlay */}
         <div 
@@ -73,46 +74,47 @@ const LogIn = () => {
           }}
         />
         
-        <div className="bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md relative z-10 border border-blue-100">
+        <div className="bg-white/95 backdrop-blur-md p-8 rounded-xl shadow-2xl w-full max-w-md relative z-10 border border-blue-100">
           {/* Inner frost effect */}
           <div 
-            className="absolute inset-0 rounded-2xl pointer-events-none" 
+            className="absolute inset-0 rounded-xl pointer-events-none" 
             style={{
               background: 'radial-gradient(circle at top right, rgba(191, 219, 254, 0.15), transparent 60%), radial-gradient(circle at bottom left, rgba(165, 243, 252, 0.15), transparent 60%)',
               boxShadow: 'inset 0 0 40px rgba(191, 219, 254, 0.1)'
             }}
           />
           
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 relative z-10">
-            Login to your account
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800 relative z-10">
+            Choose Department
           </h2>
 
-          <input
-            type="email"
-            placeholder="Email address"
-            className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white relative z-10"
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full mb-6 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white relative z-10"
-          />
+          <select
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
+            className="w-full mb-6 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white relative z-10"
+          >
+            <option value="">Select Department</option>
+            <option>Electricity</option>
+            <option>Transport</option>
+            <option>Waste</option>
+            <option>Manufacturing</option>
+          </select>
 
           <button
-            onClick={handleLogin}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition-all hover:shadow-lg relative z-10"
+            disabled={!department}
+            onClick={handleContinue}
+            className={`w-full py-3 rounded-lg font-semibold transition-all relative z-10 ${
+              department
+                ? "bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-lg"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
           >
             Continue
           </button>
-
-          <p className="text-sm text-center text-gray-500 mt-4 relative z-10">
-            Forgot password?
-          </p>
         </div>
       </div>
     </div>
   );
 };
 
-export default LogIn;
+export default Onboarding;
