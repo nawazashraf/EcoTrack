@@ -12,10 +12,17 @@ const calculateEmission = async (category, value) => {
     }
 
     const co2e = value * factorDoc.factor;
-    let scope = "Scope 3";
+
+    let scope = "Scope 3"; 
     const cat = category.toLowerCase();
-    if (['diesel', 'petrol', 'gas', 'generator'].includes(cat)) scope = "Scope 1";
-    if (['electricity', 'heating'].includes(cat)) scope = "Scope 2";
+
+    if (['fuel', 'diesel', 'petrol', 'generator'].includes(cat)) {
+      scope = "Scope 1";
+    }
+    
+    if (['electricity', 'heating', 'cooling'].includes(cat)) {
+      scope = "Scope 2";
+    }
 
     return { 
       co2e: parseFloat(co2e.toFixed(2)), 
