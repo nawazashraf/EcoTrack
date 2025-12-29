@@ -1,8 +1,7 @@
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
-  User,
-  FileText,
+
   ChevronLeft,
   ChevronRight,
   Factory,
@@ -10,17 +9,21 @@ import {
   Layers,
   BarChart3,
   Activity,
+  Leaf,
 } from "lucide-react";
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-gray-900 text-white transition-all duration-300 
-      ${collapsed ? "w-20 flex flex-col items-center " : "w-64"}`}
+      className={`fixed left-0 top-0 h-screen bg-gray-900 text-white transition-all duration-300  bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
+      ${collapsed ? "w-20 " : "w-64"}`}
     >
       {/* SideBar Header*/}
-      <div className="flex items-center justify-between border-b border-gray-800 p-4">
-        {!collapsed && <span className="text-lg font-bold">EcoLOGS</span>}
+      <div
+        className={`flex items-center border-b border-gray-800 p-4
+        ${collapsed ? "justify-center" : "justify-between"}`}
+      >
+        {!collapsed && <span className="text-lg font-bold flex items-center gap-x-2"><Leaf size={20}/>EcoLOGS</span>}
 
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -31,7 +34,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="mt-4 flex flex-col gap-1 gap-y-2 px-2">
+      <nav className="mt-4 flex flex-col gap-x-1 gap-y-3 px-2">
         <SidebarLink
           to="/"
           icon={<LayoutDashboard size={20} />}
@@ -82,13 +85,19 @@ const SidebarLink = ({ to, icon, label, collapsed }) => {
         `group flex items-center gap-3 rounded px-3 py-2 text-sm transition
         ${
           isActive
-            ? "bg-green-600 text-white"
-            : "text-gray-300 hover:bg-gray-800"
+            ? "bg-[#26D971] text-black"
+            : "text-gray-300 hover:bg-[#26D971]/20"
         } ${collapsed && "flex justify-center items-center"}`
       }
     >
       {icon}
       {!collapsed && <span>{label}</span>}
+      {/* Tooltip (shadcn-style) */}
+      {collapsed && (
+        <span className="absolute left-14 z-10 hidden whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white group-hover:block">
+          {label}
+        </span>
+      )}
     </NavLink>
   );
 };
