@@ -15,16 +15,41 @@ exports.getOverview = async (req, res) => {
 exports.getTrends = async (req, res) => {
   try {
     const data = await ActivityData.aggregate([
-      { 
-        $group: {
-          _id: { year: { $year: "$date" }, month: { $month: "$date" } },
-          total: { $sum: "$co2e" }
+      {
+        $match: {
+          date: { $exists: true, $ne: null }
         }
       },
-      { $sort: { "_id.year": 1, "_id.month": 1 } }
+      {
+        $group: {
+          _id: {
+            year: { $year: "$date" },
+            month: { $month: "$date" }
+          },
+          totalCO2e: { $sum: "$co2e" }
+        }
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id.year",
+          month: "$_id.month",
+          totalCO2e: 1
+        }
+      }
     ]);
-    res.json(data);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+
+    res.status(200).json(data);
+  } catch (err) {
+    console.error("Error fetching trends:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
 
 exports.getRecommendations = async (req, res) => {
