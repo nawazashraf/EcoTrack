@@ -110,24 +110,12 @@ exports.getPrediction = async (req, res) => {
 
 exports.getComparison = async (req, res) => {
   try {
-    const today = new Date();
-    const currentMonth = today.getMonth() + 1;
-    const currentYear = today.getFullYear();
-    
-    let prevMonth = currentMonth - 1;
-    let prevYear = currentYear;
-    if (prevMonth === 0) { prevMonth = 12; prevYear = currentYear - 1; }
-
     const data = await ActivityData.aggregate([
       {
-        $project: { year: { $year: "$date" }, month: { $month: "$date" }, co2e: 1 }
-      },
-      {
-        $match: {
-          $or: [
-            { year: currentYear, month: currentMonth },
-            { year: prevYear, month: prevMonth }
-          ]
+        $project: {
+          year: { $year: "$date" },
+          month: { $month: "$date" },
+          co2e: 1
         }
       },
       {
@@ -135,20 +123,44 @@ exports.getComparison = async (req, res) => {
           _id: { year: "$year", month: "$month" },
           total: { $sum: "$co2e" }
         }
-      }
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1 } },
+      { $limit: 2 }
     ]);
 
-    const current = data.find(d => d._id.month === currentMonth)?.total || 0;
-    const previous = data.find(d => d._id.month === prevMonth)?.total || 0;
-    const change = current - previous;
+    if (data.length < 2) {
+      return res.json({
+        message: "Not enough data to compare periods"
+      });
+    }
+
+    const [current, previous] = data;
+
+    const change = current.total - previous.total;
+    const percentage =
+      previous.total === 0
+        ? 0
+        : ((change / previous.total) * 100).toFixed(1);
 
     res.json({
-      currentPeriod: { value: current.toFixed(2) },
-      previousPeriod: { value: previous.toFixed(2) },
-      change: change.toFixed(2),
-      trend: change < 0 ? "Decreasing" : "Increasing"
+      currentPeriod: {
+        label: `${current._id.month}/${current._id.year}`,
+        totalCO2e: current.total.toFixed(2)
+      },
+      previousPeriod: {
+        label: `${previous._id.month}/${previous._id.year}`,
+        totalCO2e: previous.total.toFixed(2)
+      },
+      change: {
+        absolute: change.toFixed(2),
+        percentage,
+        trend: change < 0 ? "Decrease" : "Increase"
+      }
     });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 exports.getEmissionBySource = async (req, res) => {
