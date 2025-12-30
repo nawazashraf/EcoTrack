@@ -1,35 +1,69 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import AuthLayout from "./layout/AuthLayout";
+import MainLayout from "./layout/MainLayout";
+
+import LogIn from "./pages/LogIn";
+import Onboarding from "./pages/Onboarding";
+
+import Dashboard from "./pages/Dashboard";
+import EmissionBySource from "./pages/EmissionBySource";
+import EmissionTrends from "./pages/EmissionTrends";
+import ScopeAnalysis from "./pages/ScopeAnalysis";
+import PerformanceComparison from "./pages/PerformanceComparison";
+import ForecastAndRisk from "./pages/ForecastAndRisk";
+import AddActivity from "./pages/AddActivity";
+import UploadActivity from "./pages/UploadActivity";
+
+import PublicOnlyRoute from "./components/PublicOnlyRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
+import OnboardingGuard from "./components/OnboardingGuard";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const router = createBrowserRouter([
+    {
+      element: <AuthLayout />,
+      children: [
+        {
+          path: "/login",
+          element: (
+            <PublicOnlyRoute>
+              <LogIn />
+            </PublicOnlyRoute>
+          ),
+        },
+        {
+          path: "/onboarding",
+          element: (
+            <ProtectedRoute>
+              <Onboarding />
+            </ProtectedRoute>
+          ),
+        },
+      ],
+    },
+    {
+      element: (
+        <ProtectedRoute>
+          <OnboardingGuard>
+            <MainLayout />
+          </OnboardingGuard>
+        </ProtectedRoute>
+      ),
+      children: [
+        { path: "/", element: <Dashboard /> },
+        { path: "/emission-by-source", element: <EmissionBySource /> },
+        { path: "/emission-trends", element: <EmissionTrends /> },
+        { path: "/scope-analysis", element: <ScopeAnalysis /> },
+        { path: "/performance-comparison", element: <PerformanceComparison /> },
+        { path: "/forecast-and-risk", element: <ForecastAndRisk /> },
+        { path: "/add-activity", element: <AddActivity /> },
+        { path: "/upload-activity", element: <UploadActivity /> },
+      ],
+    },
+  ]);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;

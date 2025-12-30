@@ -1,0 +1,104 @@
+import * as React from "react";
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+type DropdownOption = {
+  value: string;
+  label: string;
+};
+
+type DropdownProps = {
+  options?: DropdownOption[];
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  width?: string;
+  emptyText?: string;
+};
+
+const Dropdown = ({
+  options = [],
+  value,
+  onChange,
+  placeholder = "Select option...",
+  width = "w-[200px]",
+  emptyText = "No results found.",
+}: DropdownProps) => {
+  const [open, setOpen] = React.useState(false);
+
+  const selectedLabel = options.find(
+    (opt) => opt.value === value
+  )?.label;
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className={cn(
+            width,
+            "justify-between bg-white text-black"
+          )}
+        >
+          {selectedLabel || placeholder}
+          <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent
+        className={cn(
+          width,
+          "p-0 bg-white text-black border shadow-md"
+        )}
+      >
+        <Command className="bg-white">
+          <CommandList>
+            <CommandEmpty>{emptyText}</CommandEmpty>
+
+            <CommandGroup>
+              {options.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  value={option.value}
+                  className="cursor-pointer hover:bg-[#26D971]/10 aria-selected:bg-[#26D971]/20"
+                  onSelect={(currentValue) => {
+                    onChange(currentValue === value ? "" : currentValue);
+                    setOpen(false);
+                  }}
+                >
+                  <CheckIcon
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === option.value
+                        ? "opacity-100"
+                        : "opacity-0"
+                    )}
+                  />
+                  {option.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+export default Dropdown;
