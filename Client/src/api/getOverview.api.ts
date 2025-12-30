@@ -2,7 +2,7 @@ import axios from "axios";
 import type { AnalyticsOverview } from "@/types/analytics";
 
 const api = axios.create({
-    baseURL: ``
+    baseURL: `/`
 })
 
 

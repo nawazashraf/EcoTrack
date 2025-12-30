@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 const api = axios.create({
-    baseURL: ``
+    baseURL: `/`
 })
 
 export const submitActivity = async (payload: ActivityForm) => {

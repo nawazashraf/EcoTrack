@@ -3,7 +3,7 @@ import type { PerformanceComparison } from "@/types/comparison";
 
 
 const api = axios.create({
-    baseURL: ``
+    baseURL: `/`
 })
 
 

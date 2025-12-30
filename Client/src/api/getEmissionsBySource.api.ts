@@ -3,7 +3,7 @@ import type { EmissionBySourceData } from "@/types/emissions";
 
 
 const api = axios.create({
-    baseURL: ``
+    baseURL: `/`
 })
 
 export const getEmissionsBySource = async (): Promise<EmissionBySourceData[]> => {
