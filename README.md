@@ -1,6 +1,6 @@
-# 🌍 EcoTracks – Carbon Footprint Analytics Dashboard
+# 🌍 EcoTrack – Carbon Footprint Analytics Dashboard
 
-EcoTracks is a full-stack Carbon Footprint Tracking and Analytics Platform designed to help organizations measure, analyze, predict, and reduce their CO₂e emissions. The system aggregates emissions data from multiple sources, applies standardized emission factors (EPA/IPCC guidelines), and delivers actionable insights through interactive dashboards, forecasts, and recommendations.
+EcoTrack is a full-stack Carbon Footprint Tracking and Analytics Platform designed to help organizations measure, analyze, predict, and reduce their CO₂e emissions. The system aggregates emissions data from multiple sources, applies standardized emission factors (EPA/IPCC guidelines), and delivers actionable insights through interactive dashboards, forecasts, and recommendations.
 
 ---
 
@@ -8,7 +8,7 @@ EcoTracks is a full-stack Carbon Footprint Tracking and Analytics Platform desig
 
 Organizations struggle to manage their carbon footprint due to fragmented data sources such as electricity bills, fuel usage logs, transportation records, and operational activities. Without a unified and structured system, sustainability goals remain difficult to measure, track, and optimize.
 
-EcoTracks addresses this challenge by providing a centralized, data-driven platform that converts raw activity data into meaningful environmental insights.
+EcoTrack addresses this challenge by providing a centralized, data-driven platform that converts raw activity data into meaningful environmental insights.
 
 ---
 
@@ -137,4 +137,4 @@ This project is developed for educational, research, and sustainability-focused 
 
 ---
 
-EcoTracks transforms carbon data into actionable climate intelligence. Measure responsibly. Reduce effectively.
+EcoTrack transforms carbon data into actionable climate intelligence. Measure responsibly. Reduce effectively.
