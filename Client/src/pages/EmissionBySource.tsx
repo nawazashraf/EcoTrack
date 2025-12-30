@@ -3,10 +3,10 @@ import { getEmissionsBySource } from "@/api/getEmissionsBySource.api";
 import EmissionsBySourceChart from "@/components/charts/EmissionsBySourceChart";
 import EmissionsBySourceKpis from "@/components/kpi/EmissionsBySourceKpis";
 import EmissionsBySourceInsight from "@/components/insights/EmissionsBySourceInsight";
-import type { EmissionBySource } from "@/types/emissions";
+import type { EmissionBySourceData } from "@/types/emissions";
 
 const EmissionBySource = () => {
-  const [data, setData] = useState<EmissionBySource[]>([]);
+  const [data, setData] = useState<EmissionBySourceData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

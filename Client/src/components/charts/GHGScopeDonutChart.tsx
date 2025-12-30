@@ -1,16 +1,10 @@
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import type { AnalyticsOverview } from "@/types/analytics";
 
 const COLORS: Record<string, string> = {
-  "Scope 1": "#ef4444", 
-  "Scope 2": "#f59e0b", 
-  "Scope 3": "#22c55e"  
+  "Scope 1": "#ef4444",
+  "Scope 2": "#f59e0b",
+  "Scope 3": "#22c55e",
 };
 
 type Props = {
@@ -20,18 +14,15 @@ type Props = {
 const GHGScopeDonutChart = ({ overview }: Props) => {
   const total = Number(overview.totalEmissions);
 
-  const data = overview.breakdown.map(item => ({
+  const data = overview.breakdown.map((item) => ({
     name: item._id,
     value: Number(item.totalCO2e.toFixed(2)),
-    percentage: total
-      ? Number(((item.totalCO2e / total) * 100).toFixed(1))
-      : 0,
-    color: COLORS[item._id] || "#94a3b8"
+    percentage: total ? Number(((item.totalCO2e / total) * 100).toFixed(1)) : 0,
+    color: COLORS[item._id] || "#94a3b8",
   }));
 
   return (
     <div className="bg-white rounded-2xl shadow p-6">
-      
       {/* Header */}
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-gray-900">
@@ -43,7 +34,7 @@ const GHGScopeDonutChart = ({ overview }: Props) => {
       </div>
 
       {/* Chart */}
-      <div className="relative h-[300px]">
+      <div className="relative h-75">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -59,10 +50,18 @@ const GHGScopeDonutChart = ({ overview }: Props) => {
             </Pie>
 
             <Tooltip
-              formatter={(value: number, _name, props: any) => [
-                `${value.toLocaleString()} kg CO₂e (${props.payload.percentage}%)`,
-                props.payload.name
-              ]}
+              formatter={(value, _name, props) => {
+                if (value === undefined || !props?.payload) {
+                  return ["–", ""];
+                }
+
+                return [
+                  `${value.toLocaleString()} kg CO₂e (${
+                    props.payload.percentage ?? 0
+                  }%)`,
+                  props.payload.name ?? "",
+                ];
+              }}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -81,7 +80,7 @@ const GHGScopeDonutChart = ({ overview }: Props) => {
 
       {/* Legend (Responsive) */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-        {data.map(item => (
+        {data.map((item) => (
           <div
             key={item.name}
             className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2"
@@ -97,7 +96,6 @@ const GHGScopeDonutChart = ({ overview }: Props) => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };

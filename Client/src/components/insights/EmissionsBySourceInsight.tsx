@@ -1,6 +1,6 @@
-import type { EmissionBySource } from "@/types/emissions";
+import type { EmissionBySourceData } from "@/types/emissions";
 
-const EmissionsBySourceInsight = ({ data }: { data: EmissionBySource[] }) => {
+const EmissionsBySourceInsight = ({ data }: { data: EmissionBySourceData[] }) => {
   const top = [...data].sort((a, b) => b.totalCO2e - a.totalCO2e)[0];
 
   return (

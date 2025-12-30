@@ -7,8 +7,17 @@ import {
 } from "@/constants/activity.constants";
 import { submitActivity } from "@/api/activity.api";
 
+type ActivityFormState = {
+  category: string;
+  value: number | "";
+  unit: string;
+  date: string;
+  department: string;
+};
+
+
 const AddActivity = () => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<ActivityFormState>({
     category: "",
     value: "",
     unit: "",
@@ -68,7 +77,7 @@ const AddActivity = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center px-4">
+    <div className="min-h-screen relative overflow-hidden bg-linear-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center px-4">
       
       {/* ❄️ Snowflakes */}
       <div className="pointer-events-none absolute inset-0 z-0">

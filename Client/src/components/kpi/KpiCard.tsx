@@ -2,9 +2,11 @@ import type { ReactNode } from "react";
 
 type KpiCardProps = {
   title: string;
-  value: ReactNode;
-  subtitle?: ReactNode;
+  value: ReactNode;   // ✅ FIX
+  subtitle?: string;
+  trend?: "Increase" | "Decrease";
 };
+
 
 const KpiCard = ({ title, value, subtitle }: KpiCardProps) => {
   return (

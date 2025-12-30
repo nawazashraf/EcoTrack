@@ -1,22 +1,15 @@
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import type { EmissionBySource } from "@/types/emissions";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import type { EmissionBySourceData } from "@/types/emissions";
 
 const COLORS = ["#2563EB", "#DC2626", "#F59E0B", "#16A34A", "#9333EA"];
 
-const EmissionsBySourceChart = ({ data }: { data: EmissionBySource[] }) => {
+const EmissionsBySourceChart = ({ data }: { data: EmissionBySourceData[] }) => {
   if (!data?.length) return null;
 
   const totalCO2e = data.reduce((s, d) => s + d.totalCO2e, 0);
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 w-full">
-
       {/* Header */}
       <div className="mb-3">
         <h2 className="text-lg font-semibold text-gray-900">
@@ -27,12 +20,12 @@ const EmissionsBySourceChart = ({ data }: { data: EmissionBySource[] }) => {
         </p>
       </div>
 
-      <div className="relative w-full  h-[300px] sm:h-[340px] lg:h-[250px]">
+      <div className="relative w-full  h-75 sm:h-85 lg:h-62.5">
         <ResponsiveContainer width="100%" height={"100%"}>
           <PieChart>
             <Pie
               data={data}
-              dataKey="totalCO2e" 
+              dataKey="totalCO2e"
               nameKey="category"
               cx="50%"
               cy="50%"
@@ -42,20 +35,19 @@ const EmissionsBySourceChart = ({ data }: { data: EmissionBySource[] }) => {
               isAnimationActive={false}
             >
               {data.map((_, i) => (
-                <Cell
-                  key={i}
-                  fill={COLORS[i % COLORS.length]}
-                />
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
               ))}
             </Pie>
 
             <Tooltip
-              formatter={(value: number, _n, props) => {
-                const pct = props.payload.percentage;
-                return [
-                  `${value.toLocaleString()} kg (${pct}%)`,
-                  "Emissions",
-                ];
+              formatter={(value, _n, props) => {
+                if (value === undefined || !props?.payload) {
+                  return ["–", "Emissions"];
+                }
+
+                const pct = props.payload.percentage ?? 0;
+
+                return [`${value.toLocaleString()} kg (${pct}%)`, "Emissions"];
               }}
             />
           </PieChart>
@@ -91,7 +83,6 @@ const EmissionsBySourceChart = ({ data }: { data: EmissionBySource[] }) => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };

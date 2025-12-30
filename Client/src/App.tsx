@@ -19,7 +19,6 @@ import PublicOnlyRoute from "./components/PublicOnlyRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OnboardingGuard from "./components/OnboardingGuard";
 
-
 function App() {
   const router = createBrowserRouter([
     {

@@ -12,7 +12,6 @@ const Onboarding = () => {
   if (!isLoaded) return null;
   if (!user) return null;
 
-  // If already onboarded → skip
   if (user.publicMetadata?.onBoardingCompleted) {
     return <Navigate to="/" replace />;
   }
@@ -33,7 +32,7 @@ const Onboarding = () => {
     formData.append("branch", "test-branch");
 
     //!Remove url for deployment
-    const res = await fetch("http://localhost:5000/api/create-user", {
+    const res = await fetch("api/create-user", {
       method: "POST",
       body: formData,
     });
@@ -95,7 +94,7 @@ const Onboarding = () => {
       </div>
 
       {/* RIGHT */}
-      <div className="flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
+      <div className="flex items-center justify-center bg-linear-to-br from-blue-50 to-white">
         <form
           onSubmit={handleSubmit}
           className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md"

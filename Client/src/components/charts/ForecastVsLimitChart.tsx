@@ -29,9 +29,9 @@ const ForecastVsLimitChart = ({ forecastValue, unit, safeLimit }: Props) => {
       <div
         className="
           w-full
-          h-[160px]
-          sm:h-[180px]
-          lg:h-[200px]
+          h-40
+          sm:h-45
+          lg:h-50
         "
       >
         <ResponsiveContainer width="100%" height="100%">

@@ -19,8 +19,18 @@ type Props = {
 };
 
 const monthNames = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const EmissionTrendsChart = ({ data }: Props) => {
@@ -52,13 +62,13 @@ const EmissionTrendsChart = ({ data }: Props) => {
               height={60}
             />
 
-            <YAxis
-              tick={{ fontSize: 11 }}
-              width={40}
-            />
+            <YAxis tick={{ fontSize: 11 }} width={40} />
 
             <Tooltip
-              formatter={(value: number) => [`${value} kg CO₂e`, "Emissions"]}
+              formatter={(value) => {
+                if (value === undefined) return ["–", "Emissions"];
+                return [`${value} kg CO₂e`, "Emissions"];
+              }}
               labelStyle={{ fontSize: 12 }}
               contentStyle={{ fontSize: 12 }}
             />

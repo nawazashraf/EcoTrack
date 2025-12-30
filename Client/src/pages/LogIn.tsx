@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SignIn } from "@clerk/clerk-react";
 
 const LogIn = () => {
@@ -46,7 +46,7 @@ const LogIn = () => {
       `}</style>
 
       {/* LEFT SIDE */}
-      <div className="hidden md:flex bg-gradient-to-br from-emerald-700 to-green-900 text-white items-center justify-center p-10 relative">
+      <div className="hidden md:flex bg-linear-to-br from-emerald-700 to-green-900 text-white items-center justify-center p-10 relative">
         <div className="relative z-10">
           <h1 className="text-4xl font-bold mb-3">EcoTrack</h1>
           <p className="text-lg opacity-90 max-w-md">
@@ -56,7 +56,7 @@ const LogIn = () => {
       </div>
 
       {/* RIGHT SIDE – Clerk Login */}
-      <div className="flex items-center justify-center bg-gradient-to-br from-blue-50 via-cyan-50 to-white relative">
+      <div className="flex items-center justify-center bg-linear-to-br from-blue-50 via-cyan-50 to-white relative">
         {/* Frost overlay */}
         <div
           className="absolute inset-0 pointer-events-none"

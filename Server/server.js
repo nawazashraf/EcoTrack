@@ -17,6 +17,7 @@ app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 
 const EmissionFactor = require('./models/EmissionFactor');
+const path = require("path");
 
 
 app.get('/api/seed', async (req, res) => {
@@ -65,6 +66,26 @@ app.get('/api/seed', async (req, res) => {
     res.status(500).send("Seeding Failed: " + err.message);
   }
 });
+
+
+if (process.env.NODE_ENV === "production") {
+  const distPath = path.join(__dirname, "../Client", "dist");
+
+  app.use(express.static(distPath));
+
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+
+  app.get(/^\/(?!api).*/, (req, res) => {
+    if (req.path.startsWith("/api")) return;
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
+
+
+console.log("NODE_ENV =", process.env.NODE_ENV);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`>> Server running on port ${PORT}`));

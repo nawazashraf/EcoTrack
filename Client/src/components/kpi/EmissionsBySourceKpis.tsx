@@ -1,10 +1,10 @@
-import type { EmissionBySource } from "@/types/emissions";
+import type { EmissionBySourceData } from "@/types/emissions";
 import KpiCard from "./KpiCard";
 
 const EmissionsBySourceKpis = ({
   data,
 }: {
-  data: EmissionBySource[];
+  data: EmissionBySourceData[];
 }) => {
   const total = data.reduce(
     (sum, d) => sum + d.totalCO2e,
