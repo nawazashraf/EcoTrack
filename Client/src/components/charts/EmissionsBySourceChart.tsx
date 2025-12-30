@@ -1,12 +1,19 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import type { EmissionBySourceData } from "@/types/emissions";
 
 const COLORS = ["#2563EB", "#DC2626", "#F59E0B", "#16A34A", "#9333EA"];
 
-const EmissionsBySourceChart = ({ data }: { data: EmissionBySourceData[] }) => {
-  if (!data?.length) return null;
+const EmissionsBySourceChart = ({ data }: { data: any[] }) => {
+  const safeData = Array.isArray(data) ? data : [];
 
-  const totalCO2e = data.reduce((s, d) => s + d.totalCO2e, 0);
+  if (safeData.length === 0) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 w-full flex items-center justify-center h-64 text-gray-400">
+        No Data Available
+      </div>
+    );
+  }
+
+  const totalCO2e = safeData.reduce((s, d) => s + (d.totalCO2e || 0), 0);
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 w-full">
@@ -20,11 +27,11 @@ const EmissionsBySourceChart = ({ data }: { data: EmissionBySourceData[] }) => {
         </p>
       </div>
 
-      <div className="relative w-full  h-75 sm:h-85 lg:h-62.5">
-        <ResponsiveContainer width="100%" height={"100%"}>
+      <div className="relative w-full h-75 sm:h-85 lg:h-62.5">
+        <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={data}
+              data={safeData}
               dataKey="totalCO2e"
               nameKey="category"
               cx="50%"
@@ -34,20 +41,21 @@ const EmissionsBySourceChart = ({ data }: { data: EmissionBySourceData[] }) => {
               paddingAngle={2}
               isAnimationActive={false}
             >
-              {data.map((_, i) => (
+              {safeData.map((_, i) => (
                 <Cell key={i} fill={COLORS[i % COLORS.length]} />
               ))}
             </Pie>
 
             <Tooltip
-              formatter={(value, _n, props) => {
+              formatter={(value: any, _n: any, props: any) => {
                 if (value === undefined || !props?.payload) {
                   return ["–", "Emissions"];
                 }
+                const pct = totalCO2e > 0 
+                  ? ((Number(value) / totalCO2e) * 100).toFixed(1) 
+                  : 0;
 
-                const pct = props.payload.percentage ?? 0;
-
-                return [`${value.toLocaleString()} kg (${pct}%)`, "Emissions"];
+                return [`${Number(value).toLocaleString()} kg (${pct}%)`, "Emissions"];
               }}
             />
           </PieChart>
@@ -65,9 +73,9 @@ const EmissionsBySourceChart = ({ data }: { data: EmissionBySourceData[] }) => {
 
       {/* Legend */}
       <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {data.map((item, i) => (
+        {safeData.map((item, i) => (
           <div
-            key={item.category}
+            key={i} 
             className="flex items-center justify-between text-sm"
           >
             <div className="flex items-center gap-2">
@@ -75,10 +83,10 @@ const EmissionsBySourceChart = ({ data }: { data: EmissionBySourceData[] }) => {
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: COLORS[i % COLORS.length] }}
               />
-              <span className="text-gray-700">{item.category}</span>
+              <span className="text-gray-700">{item.category || item._id || "Unknown"}</span>
             </div>
             <span className="font-medium text-gray-900">
-              {item.percentage}%
+              {totalCO2e > 0 ? ((item.totalCO2e / totalCO2e) * 100).toFixed(1) : 0}%
             </span>
           </div>
         ))}

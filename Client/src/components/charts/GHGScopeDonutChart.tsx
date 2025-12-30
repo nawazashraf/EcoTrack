@@ -1,5 +1,4 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import type { AnalyticsOverview } from "@/types/analytics";
 
 const COLORS: Record<string, string> = {
   "Scope 1": "#ef4444",
@@ -8,15 +7,24 @@ const COLORS: Record<string, string> = {
 };
 
 type Props = {
-  overview: AnalyticsOverview;
+  overview: any; 
 };
 
 const GHGScopeDonutChart = ({ overview }: Props) => {
-  const total = Number(overview.totalEmissions);
+  const breakdown = Array.isArray(overview?.breakdown) ? overview.breakdown : [];
+  const total = Number(overview?.totalEmissions || 0);
 
-  const data = overview.breakdown.map((item) => ({
-    name: item._id,
-    value: Number(item.totalCO2e.toFixed(2)),
+  if (breakdown.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-center h-80 text-gray-400">
+        No Scope Data Available
+      </div>
+    );
+  }
+
+  const data = breakdown.map((item: any) => ({
+    name: item._id || "Unknown",
+    value: Number((item.totalCO2e || 0).toFixed(2)),
     percentage: total ? Number(((item.totalCO2e / total) * 100).toFixed(1)) : 0,
     color: COLORS[item._id] || "#94a3b8",
   }));
@@ -35,7 +43,7 @@ const GHGScopeDonutChart = ({ overview }: Props) => {
 
       {/* Chart */}
       <div className="relative h-75">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
               data={data}
@@ -44,19 +52,18 @@ const GHGScopeDonutChart = ({ overview }: Props) => {
               outerRadius={115}
               paddingAngle={3}
             >
-              {data.map((item, index) => (
+              {data.map((item: any, index: number) => (
                 <Cell key={index} fill={item.color} />
               ))}
             </Pie>
 
             <Tooltip
-              formatter={(value, _name, props) => {
+              formatter={(value: any, _name: any, props: any) => {
                 if (value === undefined || !props?.payload) {
                   return ["–", ""];
                 }
-
                 return [
-                  `${value.toLocaleString()} kg CO₂e (${
+                  `${Number(value).toLocaleString()} kg CO₂e (${
                     props.payload.percentage ?? 0
                   }%)`,
                   props.payload.name ?? "",
@@ -78,9 +85,9 @@ const GHGScopeDonutChart = ({ overview }: Props) => {
         </div>
       </div>
 
-      {/* Legend (Responsive) */}
+      {/* Legend */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-        {data.map((item) => (
+        {data.map((item: any) => (
           <div
             key={item.name}
             className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2"

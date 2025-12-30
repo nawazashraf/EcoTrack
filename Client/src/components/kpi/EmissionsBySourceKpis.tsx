@@ -1,25 +1,25 @@
-import type { EmissionBySourceData } from "@/types/emissions";
 import KpiCard from "./KpiCard";
 
-const EmissionsBySourceKpis = ({
-  data,
-}: {
-  data: EmissionBySourceData[];
-}) => {
-  const total = data.reduce(
-    (sum, d) => sum + d.totalCO2e,
-    0
-  );
+const EmissionsBySourceKpis = ({ data }: { data: any[] }) => {
+  const safeData = Array.isArray(data) ? data : [];
 
-  const sorted = [...data].sort(
-    (a, b) => b.totalCO2e - a.totalCO2e
-  );
+  if (safeData.length === 0) {
+    return (
+      <div className="rounded-2xl border border-gray-100 p-4 text-center text-gray-500">
+        Loading KPIs...
+      </div>
+    );
+  }
 
-  const top = sorted[0];
-  const lowest = sorted[sorted.length - 1];
+  const total = safeData.reduce((sum, d) => sum + (d.totalCO2e || 0), 0);
+
+  const sorted = [...safeData].sort((a, b) => (b.totalCO2e || 0) - (a.totalCO2e || 0));
+
+  const top = sorted[0] || { category: "N/A", percentage: 0 };
+  const lowest = sorted[sorted.length - 1] || { category: "N/A", percentage: 0 };
 
   return (
-    <div className="rounded-2xl border border-gray-100 p-3  flex flex-col gap-x-2 gap-y-4">
+    <div className="rounded-2xl border border-gray-100 p-3 flex flex-col gap-x-2 gap-y-4">
       <KpiCard
         title="Total Emissions"
         value={`${total.toLocaleString()} kg`}
@@ -28,20 +28,20 @@ const EmissionsBySourceKpis = ({
 
       <KpiCard
         title="Top Source"
-        value={top.category}
-        subtitle={`${top.percentage}%`}
+        value={top.category || "N/A"}
+        subtitle={`${top.percentage || 0}%`}
       />
 
       <KpiCard
         title="Top Contribution"
-        value={`${top.percentage}%`}
+        value={`${top.percentage || 0}%`}
         subtitle="Highest impact"
       />
 
       <KpiCard
         title="Lowest Source"
-        value={lowest.category}
-        subtitle={`${lowest.percentage}%`}
+        value={lowest.category || "N/A"}
+        subtitle={`${lowest.percentage || 0}%`}
       />
     </div>
   );

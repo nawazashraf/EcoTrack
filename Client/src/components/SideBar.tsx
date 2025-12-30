@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { UserButton, useUser } from "@clerk/clerk-react";
 
 type SidebarProps = {
   collapsed: boolean;
@@ -31,7 +32,6 @@ type SidebarLinkProps = {
   onClick?: () => void;
 };
 
-
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
@@ -44,7 +44,6 @@ const useIsMobile = () => {
   return isMobile;
 };
 
-
 const Sidebar = ({
   collapsed,
   setCollapsed,
@@ -52,7 +51,7 @@ const Sidebar = ({
   setMobileOpen,
 }: SidebarProps) => {
   const isMobile = useIsMobile();
-
+  const { user } = useUser(); 
   const isCollapsed = isMobile ? false : collapsed;
 
   return (
@@ -62,6 +61,7 @@ const Sidebar = ({
         bg-linear-to-b from-[#2A563C] via-[#284F38] to-[#244230]
         transition-all duration-300
         fixed left-0 top-0
+        flex flex-col  /* <--- 3. ADDED FLEX COL TO PUSH FOOTER DOWN */
         ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
         w-64
         lg:relative lg:translate-x-0
@@ -90,7 +90,7 @@ const Sidebar = ({
       </div>
 
       {/* Navigation */}
-      <nav className="mt-4 flex flex-col gap-y-3 px-2">
+      <nav className="mt-4 flex flex-col gap-y-3 px-2 flex-1"> {/* <--- Added flex-1 to push footer */}
         <SidebarLink to="/" icon={<LayoutDashboard size={20} />} label="Dashboard" collapsed={isCollapsed} end onClick={() => setMobileOpen(false)} />
         <SidebarLink to="/emission-by-source" icon={<Factory size={20} />} label="Emissions by Source" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
         <SidebarLink to="/emission-trends" icon={<TrendingUp size={20} />} label="Emissions Trends" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
@@ -112,11 +112,26 @@ const Sidebar = ({
         <SidebarLink to="/add-activity" icon={<Plus size={20} />} label="Add Activity" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
         <SidebarLink to="/upload-activity" icon={<Upload size={20} />} label="Upload Activity" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
       </nav>
+
+      {/* ✅ 4. USER PROFILE & LOGOUT SECTION */}
+      <div className={`border-t border-[#3A6A4C]/40 p-4 ${isCollapsed ? "flex justify-center" : ""}`}>
+        <div className="flex items-center gap-3">
+          {/* Clerk User Button - Handles Logout automatically */}
+          <UserButton afterSignOutUrl="/login" />
+          
+          {!isCollapsed && user && (
+            <div className="flex flex-col overflow-hidden">
+              <span className="truncate text-sm font-medium">{user.fullName}</span>
+              <span className="truncate text-xs text-gray-300">{user.primaryEmailAddress?.emailAddress}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
     </aside>
   );
 };
 
-/* ---------- Sidebar Link ---------- */
 
 const SidebarLink = ({
   to,

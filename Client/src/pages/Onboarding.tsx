@@ -4,44 +4,59 @@ import { Navigate, useNavigate } from "react-router-dom";
 
 const Onboarding = () => {
   const [department, setDepartment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [snowflakes, setSnowflakes] = useState<any[]>([]);
 
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
+  
+  const API_URL = import.meta.env.VITE_API_URL || "https://ecotrack-backend-vkcx.onrender.com";
 
   if (!isLoaded) return null;
-  if (!user) return null;
-
-  if (user.publicMetadata?.onBoardingCompleted) {
-    return <Navigate to="/" replace />;
-  }
+  if (!user) return <Navigate to="/login" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const formData = new FormData();
-    formData.append("clerkUserId", user.id);
-    formData.append(
-      "name",
-      user.username ||
-        user.emailAddresses[0].emailAddress.split("@")[0]
-    );
-    formData.append("email", user.emailAddresses[0].emailAddress);
-    formData.append("organizationName", "test-org");
-    formData.append("department", department);
-    formData.append("branch", "test-branch");
+    try {
+      const payload = {
+        name: user.fullName || user.username || "User",
+        email: user.primaryEmailAddress?.emailAddress,
+        clerkId: user.id,
+        department: department, 
+        organizationName: "CodeFrost Org", 
+      };
 
-    //!Remove url for deployment
-    const res = await fetch("api/create-user", {
-      method: "POST",
-      body: formData,
-    });
+      console.log("🚀 Sending to:", `${API_URL}/api/auth/clerk-sync`);
 
-    const data = await res.json();
-    console.log(data);
+      const res = await fetch(`${API_URL}/api/auth/clerk-sync`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json" 
+        },
+        body: JSON.stringify(payload),
+      });
 
-    await user.reload();
-    navigate("/", { replace: true });
+      const data = await res.json();
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        console.log("✅ Onboarding Success:", data);
+        navigate("/", { replace: true });
+      } else {
+        console.error("Server Error:", data);
+        alert("Server connection failed. Trying to proceed anyway...");
+        // Fallback: Go to dashboard even if backend glitches 
+        navigate("/", { replace: true });
+      }
+
+    } catch (error) {
+      console.error("❌ Onboarding Error:", error);
+      alert("Network Error. Check console.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Snow animation
@@ -117,14 +132,14 @@ const Onboarding = () => {
 
           <button
             type="submit"
-            disabled={!department}
-            className={`w-full py-3 rounded-lg font-semibold ${
+            disabled={!department || isSubmitting}
+            className={`w-full py-3 rounded-lg font-semibold transition-all ${
               department
-                ? "bg-emerald-600 text-white"
-                : "bg-gray-300 text-gray-500"
+                ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            Continue
+            {isSubmitting ? "Saving..." : "Continue"}
           </button>
         </form>
       </div>

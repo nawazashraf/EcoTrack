@@ -1,5 +1,3 @@
-// import KpiCard from "@/components/ui/KpiCard";
-
 import KpiCard from "./KpiCard";
 
 type TrendItem = {
@@ -14,22 +12,35 @@ const monthNames = [
 ];
 
 const EmissionTrendKPIs = ({ data }: { data: TrendItem[] }) => {
-  if (!data.length) return null;
+  const safeData = Array.isArray(data) ? data : [];
 
-  const total = data.reduce((sum, d) => sum + d.totalCO2e, 0);
-  const avg = total / data.length;
+  if (safeData.length === 0) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard title="Total Emissions" value="-" subtitle="Loading..." />
+        <KpiCard title="Avg / Month" value="-" subtitle="Loading..." />
+        <KpiCard title="MoM Change" value="-" subtitle="Loading..." />
+        <KpiCard title="Peak Month" value="-" subtitle="Loading..." />
+      </div>
+    );
+  }
 
-  const latest = data[data.length - 1];
-  const previous = data[data.length - 2];
+  const total = safeData.reduce((sum, d) => sum + (d.totalCO2e || 0), 0);
+  const avg = total / safeData.length;
+
+  const latest = safeData[safeData.length - 1];
+  const previous = safeData[safeData.length - 2];
 
   const momChange =
-    previous
+    previous && previous.totalCO2e > 0
       ? ((latest.totalCO2e - previous.totalCO2e) / previous.totalCO2e) * 100
       : null;
 
-  const peak = data.reduce((max, d) =>
-    d.totalCO2e > max.totalCO2e ? d : max
-  );
+  const peak = safeData.reduce((max, d) =>
+    (d.totalCO2e || 0) > (max.totalCO2e || 0) ? d : max
+  , safeData[0]);
+
+  const peakMonthName = monthNames[(peak.month || 1) - 1] || "Unknown";
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -64,8 +75,8 @@ const EmissionTrendKPIs = ({ data }: { data: TrendItem[] }) => {
 
       <KpiCard
         title="Peak Month"
-        value={`${peak.totalCO2e.toFixed(1)} kg`}
-        subtitle={`${monthNames[peak.month - 1]} ${peak.year}`}
+        value={`${(peak.totalCO2e || 0).toFixed(1)} kg`}
+        subtitle={`${peakMonthName} ${peak.year || ""}`}
       />
 
     </div>

@@ -3,12 +3,14 @@ import { Navigate } from "react-router-dom";
 import type { JSX } from "react";
 
 const OnboardingGuard = ({ children }: { children: JSX.Element }) => {
-  const { user, isLoaded } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
 
   if (!isLoaded) return null;
 
-  if (!user?.publicMetadata?.onBoardingCompleted) {
-    return <Navigate to="/onboarding" replace />;
+  // HACKATHON FIX: Just check if they are logged in. 
+  // We skip the 'onBoardingCompleted' check to avoid getting stuck.
+  if (!isSignedIn) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
