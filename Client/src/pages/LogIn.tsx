@@ -83,7 +83,7 @@ const LogIn = () => {
 
           {/* 🔐 REAL AUTH (Clerk) */}
           <SignIn
-            redirectUrl="/"
+            fallbackRedirectUrl="/"
             appearance={{
               elements: {
                 card: "shadow-none bg-transparent",
