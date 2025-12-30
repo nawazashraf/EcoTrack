@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/SideBar";
 import { Leaf, Menu } from "lucide-react";
+import AuthSync from "../components/AuthSync";
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -9,6 +10,8 @@ const MainLayout = () => {
 
   return (
     <div className="flex">
+      {/* AuthSync component for Clerk sync */}
+      <AuthSync />
       <Sidebar
         collapsed={collapsed}
         setCollapsed={setCollapsed}
