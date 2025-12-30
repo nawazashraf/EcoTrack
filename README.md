@@ -125,8 +125,8 @@ Analytics:
 ![Forecast Risk Analysis](<Screenshot 2025-12-30 181826.png>) ![upload activity](<Screenshot 2025-12-30 181857.png>) ![Dashboard](<Screenshot 2025-12-30 181638.png>) ![Emission by Source](<Screenshot 2025-12-30 181739.png>)
 
 ---
-## video
-<video controls src="VID-20251230-WA0042.mp4" Demo"></video>
+## video Link
+https://drive.google.com/drive/folders/1EyqJWGeHi_lwICcu4_pemClbwabV87tE
 
 ---
 ## License
