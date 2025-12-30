@@ -27,3 +27,61 @@ exports.login = async (req, res) => {
     res.json({ token, user: { name: user.name, email: user.email } });
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
+
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      department: user.department,
+      organizationId: user.organizationId
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.clerkSync = async (req, res) => {
+  try {
+    const { email, name, clerkId } = req.body;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        name: name || "Clerk User",
+        email,
+        password: "clerk_managed_password", 
+        clerkId: clerkId,
+        organizationId: "org_default_123", 
+        department: "General",             
+        role: "user"
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role }, 
+      process.env.JWT_SECRET,            
+      { expiresIn: '30d' }
+    );
+
+    res.status(200).json({ 
+      success: true, 
+      token, 
+      user: {
+        id: user._id,
+        name: user.name,
+        department: user.department
+      } 
+    });
+
+  } catch (err) {
+    console.error("Clerk Sync Error:", err);
+    res.status(500).json({ error: "Sync failed" });
+  }
+};
