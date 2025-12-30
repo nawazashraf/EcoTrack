@@ -77,7 +77,7 @@ const Sidebar = ({
         {!isCollapsed && (
           <span className="text-lg font-bold flex items-center gap-2">
             <Leaf size={20} />
-            EcoLOGS
+            EcoTrack
           </span>
         )}
 
