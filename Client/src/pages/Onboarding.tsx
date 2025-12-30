@@ -32,7 +32,7 @@ const Onboarding = () => {
     formData.append("branch", "test-branch");
 
     //!Remove url for deployment
-    const res = await fetch("api/create-user", {
+    const res = await fetch("/api/create-user", {
       method: "POST",
       body: formData,
     });
