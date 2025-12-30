@@ -23,7 +23,6 @@ const EmissionBySource = () => {
     fetchData();
   }, []);
 
-  console.log(data);
   
 
   if (loading) {

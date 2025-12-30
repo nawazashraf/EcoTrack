@@ -38,7 +38,6 @@ const Onboarding = () => {
     });
 
     const data = await res.json();
-    console.log(data);
 
     await user.reload();
     navigate("/", { replace: true });

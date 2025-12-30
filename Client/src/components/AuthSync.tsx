@@ -11,7 +11,6 @@ const AuthSync = () => {
 
       if (isSignedIn && user && !localToken) {
         try {
-          console.log("🔄 Syncing to Backend...");
           const res = await fetch(`${API_URL}/api/auth/clerk-sync`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -25,7 +24,6 @@ const AuthSync = () => {
           const data = await res.json();
           if (data.token) {
             localStorage.setItem("token", data.token);
-            console.log("✅ Backend Connected! Token Saved.");
             window.location.reload(); 
           }
         } catch (err) {
