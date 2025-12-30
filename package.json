@@ -1,0 +1,22 @@
+{
+  "name": "ecotrack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd Client && npm install && npm run build && cd ../Server && npm install",
+    "start": "cd Server && node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nawazashraf/EcoTrack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nawazashraf/EcoTrack/issues"
+  },
+  "homepage": "https://github.com/nawazashraf/EcoTrack#readme"
+}
