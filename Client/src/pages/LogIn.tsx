@@ -18,7 +18,7 @@ const LogIn = () => {
 
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 relative overflow-hidden">
-      {/* ❄️ Snowflake Effect */}
+      {/* Snowflakes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
         {snowflakes.map((flake) => (
           <div
@@ -45,9 +45,8 @@ const LogIn = () => {
         }
       `}</style>
 
-      {/* LEFT SIDE */}
-      <div className="hidden md:flex bg-linear-to-br from-emerald-700 to-green-900 text-white items-center justify-center p-10 relative">
-        <div className="relative z-10">
+      <div className="hidden md:flex bg-linear-to-br from-emerald-700 to-green-900 text-white items-center justify-center p-10">
+        <div>
           <h1 className="text-4xl font-bold mb-3">EcoTrack</h1>
           <p className="text-lg opacity-90 max-w-md">
             Track, analyze, and reduce your carbon footprint with confidence.
@@ -55,38 +54,16 @@ const LogIn = () => {
         </div>
       </div>
 
-      {/* RIGHT SIDE – Clerk Login */}
-      <div className="flex items-center justify-center bg-linear-to-br from-blue-50 via-cyan-50 to-white relative">
-        {/* Frost overlay */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle at center, rgba(191, 219, 254, 0.2), transparent 70%)",
-          }}
-        />
-
-        <div className="bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md relative z-10 border border-blue-100">
-          {/* Inner frost effect */}
-          <div
-            className="absolute inset-0 rounded-2xl pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(circle at top right, rgba(191, 219, 254, 0.15), transparent 60%), radial-gradient(circle at bottom left, rgba(165, 243, 252, 0.15), transparent 60%)",
-              boxShadow: "inset 0 0 40px rgba(191, 219, 254, 0.1)",
-            }}
-          />
-
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 relative z-10">
-            Login to your account
-          </h2>
-
-          {/* 🔐 REAL AUTH (Clerk) */}
+      <div className="flex items-center justify-center bg-[#EDF8FC] relative">
+        <div className="relative z-10">
           <SignIn
             redirectUrl="/"
             appearance={{
               elements: {
-                card: "shadow-none bg-transparent",
+                card: "shadow-none bg-transparent border-none",
+                headerTitle: "hidden",
+                headerSubtitle: "hidden",
+                footer: "hidden",
                 formButtonPrimary:
                   "bg-green-600 hover:bg-green-700 text-white",
               },

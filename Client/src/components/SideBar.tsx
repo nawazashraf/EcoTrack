@@ -12,6 +12,7 @@ import {
   Plus,
   Upload,
 } from "lucide-react";
+import { UserButton } from "@clerk/clerk-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 
@@ -31,7 +32,7 @@ type SidebarLinkProps = {
   onClick?: () => void;
 };
 
-
+/* ---------- Mobile Hook ---------- */
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
@@ -44,7 +45,7 @@ const useIsMobile = () => {
   return isMobile;
 };
 
-
+/* ---------- Sidebar ---------- */
 const Sidebar = ({
   collapsed,
   setCollapsed,
@@ -52,7 +53,6 @@ const Sidebar = ({
   setMobileOpen,
 }: SidebarProps) => {
   const isMobile = useIsMobile();
-
   const isCollapsed = isMobile ? false : collapsed;
 
   return (
@@ -66,9 +66,10 @@ const Sidebar = ({
         w-64
         lg:relative lg:translate-x-0
         ${isCollapsed ? "lg:w-20" : "lg:w-64"}
+        flex flex-col
       `}
     >
-      {/* Header */}
+      {/* ---------- Header ---------- */}
       <div
         className={`flex items-center border-b border-[#3A6A4C]/40 p-4
         ${isCollapsed ? "justify-center" : "justify-between"}`}
@@ -80,17 +81,16 @@ const Sidebar = ({
           </span>
         )}
 
-        {/* Desktop collapse only */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden lg:block rounded p-1 hover:bg-gray-800"
+          className="hidden lg:block rounded p-1 hover:bg-black/20"
         >
           {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="mt-4 flex flex-col gap-y-3 px-2">
+      {/* ---------- Navigation ---------- */}
+      <nav className="mt-4 flex flex-col gap-y-3 px-2 flex-1">
         <SidebarLink to="/" icon={<LayoutDashboard size={20} />} label="Dashboard" collapsed={isCollapsed} end onClick={() => setMobileOpen(false)} />
         <SidebarLink to="/emission-by-source" icon={<Factory size={20} />} label="Emissions by Source" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
         <SidebarLink to="/emission-trends" icon={<TrendingUp size={20} />} label="Emissions Trends" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
@@ -98,7 +98,6 @@ const Sidebar = ({
         <SidebarLink to="/performance-comparison" icon={<BarChart3 size={20} />} label="Performance Comparison" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
         <SidebarLink to="/forecast-and-risk" icon={<Activity size={20} />} label="Forecast & Risk" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
 
-        {/* Divider */}
         <div className="my-4 flex items-center gap-3 px-3">
           <div className="h-px flex-1 bg-white/20" />
           {!isCollapsed && (
@@ -112,12 +111,35 @@ const Sidebar = ({
         <SidebarLink to="/add-activity" icon={<Plus size={20} />} label="Add Activity" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
         <SidebarLink to="/upload-activity" icon={<Upload size={20} />} label="Upload Activity" collapsed={isCollapsed} onClick={() => setMobileOpen(false)} />
       </nav>
+
+      {/* ---------- PROFESSIONAL USER SECTION ---------- */}
+      <div className="border-t border-white/10 px-4 py-3">
+        <div
+          className={`flex items-center gap-3
+          ${isCollapsed ? "justify-center" : ""}`}
+        >
+          <UserButton
+            afterSignOutUrl="/login"
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8",
+              },
+            }}
+          />
+
+          {!isCollapsed && (
+            <div className="leading-tight">
+              <p className="text-sm font-medium text-white">Account</p>
+              <p className="text-xs text-white/50">Manage profile & logout</p>
+            </div>
+          )}
+        </div>
+      </div>
     </aside>
   );
 };
 
 /* ---------- Sidebar Link ---------- */
-
 const SidebarLink = ({
   to,
   icon,
@@ -144,7 +166,6 @@ const SidebarLink = ({
       {icon}
       {!collapsed && <span>{label}</span>}
 
-      {/* Tooltip (desktop collapsed only) */}
       {collapsed && (
         <span className="absolute left-14 z-10 hidden whitespace-nowrap rounded bg-[#1F3A2B] px-2 py-1 text-xs text-white group-hover:block">
           {label}

@@ -9,9 +9,10 @@ const MainLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex">
-      {/* AuthSync component for Clerk sync */}
+    <div className="flex h-screen overflow-hidden bg-gray-100">
       <AuthSync />
+
+      {/* SIDEBAR */}
       <Sidebar
         collapsed={collapsed}
         setCollapsed={setCollapsed}
@@ -19,22 +20,26 @@ const MainLayout = () => {
         setMobileOpen={setMobileOpen}
       />
 
-      <div className="flex-1 min-h-screen bg-gray-100">
+      {/* CONTENT */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+
         {/* Mobile Header */}
-        <div className="flex items-center justify-between bg-[#2A553C] text-white p-4 lg:hidden">
-          <div className="flex items-center gap-2 font-bold">
+        <div className="flex items-center justify-between bg-[#2A553C] text-white px-4 py-3 lg:hidden">
+          <div className="flex items-center gap-2 font-semibold">
             <Leaf size={20} />
             EcoLOGS
           </div>
 
-          <button onClick={() => setMobileOpen(true)}>
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 rounded-md hover:bg-white/10"
+          >
             <Menu />
           </button>
         </div>
 
-        <main
-          className={`transition-all duration-300 lg:${collapsed ? "ml-20" : "ml-64"}`}
-        >
+        {/* Scrollable Content */}
+        <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
       </div>
