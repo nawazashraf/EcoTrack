@@ -73,15 +73,13 @@ if (process.env.NODE_ENV === "production") {
 
   app.use(express.static(distPath));
 
-  app.get("/", (req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
-  });
-
-  app.get(/^\/(?!api).*/, (req, res) => {
-    if (req.path.startsWith("/api")) return;
+  // SPA fallback (Express v5 / Node 22 safe)
+  app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
+
+
 
 
 console.log("NODE_ENV =", process.env.NODE_ENV);
