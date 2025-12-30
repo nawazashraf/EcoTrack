@@ -122,14 +122,6 @@ Analytics:
 
 ---
 
-## Contributors
-
-- Backend and API Development
-- Emission Calculation Engine
-- Analytics and Forecasting
-- Dashboard and Data Visualization
-
----
 
 ## License
 
