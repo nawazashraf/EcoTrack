@@ -1,3 +1,4 @@
+
 import { getPrediction } from "@/api/getPredictions.api";
 import { getRecommendation } from "@/api/getRecommendations.api";
 import { useEffect, useState } from "react";
@@ -7,10 +8,10 @@ import RiskDominanceChart from "@/components/charts/RiskDominanceChart";
 type ForecastResponse = {
   predictionForNextMonth: {
     value: number;
-    unit: string;
+    unit: "kgCO2e" | "tCO2e";
   };
   basedOn: string;
-  trend: string;
+  trend: "Increasing" | "Decreasing" | "Stable" | "Unknown";
   confidence: string;
   suggestion: string;
 };
@@ -21,7 +22,8 @@ type Recommendation = {
   suggestion: string;
 };
 
-const SAFE_LIMIT = 5; // tCO2e
+// 🔒 SINGLE SOURCE OF TRUTH (TONS)
+const SAFE_LIMIT_TON = 5;
 
 const ForecastAndRisk = () => {
   const [forecast, setForecast] = useState<ForecastResponse | null>(null);
@@ -53,32 +55,30 @@ const ForecastAndRisk = () => {
 
   const primaryRisk = recommendations[0];
 
+  const safeLimit =
+    forecast.predictionForNextMonth.unit === "kgCO2e"
+      ? SAFE_LIMIT_TON * 1000
+      : SAFE_LIMIT_TON;
+
   return (
     <div className="min-h-screen w-full bg-[#EDF8FC]">
       <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
 
-        {/* Header  */}
+        {/* Header */}
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
             Forecast & Risk Analysis
           </h1>
           <p className="text-sm text-gray-600 mt-1">
-            Predict future emissions and identify key risk drivers based on recent data.
+            Predict future emissions and identify key risk drivers.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* Risk Dominance chart */}
+          {/* Risk Dominance */}
           {primaryRisk && (
-            <div
-              className="
-                bg-white rounded-xl shadow p-4
-                h-[360px]
-                sm:h-[420px]
-                lg:h-[520px]
-              "
-            >
+            <div className="bg-white rounded-xl shadow p-4 h-[360px] sm:h-[420px] lg:h-[520px]">
               <RiskDominanceChart
                 category={primaryRisk.category}
                 impact={primaryRisk.impact}
@@ -87,10 +87,10 @@ const ForecastAndRisk = () => {
             </div>
           )}
 
-          {/* Forecast Card */}
+          {/* Forecast Section */}
           <div className="flex flex-col gap-6">
 
-            {/*Forecast Summary */}
+            {/* Forecast Summary */}
             <div className="bg-white rounded-xl shadow p-4">
               <div className="flex items-start justify-between">
                 <div>
@@ -146,19 +146,12 @@ const ForecastAndRisk = () => {
               </p>
             </div>
 
-            {/*Forecast vs Limit Chart*/}
-            <div
-              className="
-                bg-white rounded-xl shadow p-4
-                h-[220px]
-                sm:h-[290px]
-                lg:h-[350px]
-              "
-            >
+            {/* Forecast vs Limit */}
+            <div className="bg-white rounded-xl shadow p-4 h-[220px] sm:h-[290px] lg:h-[350px]">
               <ForecastVsLimitChart
                 forecastValue={forecast.predictionForNextMonth.value}
                 unit={forecast.predictionForNextMonth.unit}
-                safeLimit={SAFE_LIMIT}
+                safeLimit={safeLimit}
               />
             </div>
           </div>

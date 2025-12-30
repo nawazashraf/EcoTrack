@@ -100,55 +100,107 @@ exports.getRecommendations = async (req, res) => {
   }
 };
 
+
+const MONTHLY_LIMIT_TCO2E = 20;
+
 exports.getPrediction = async (req, res) => {
   try {
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
     const monthlyData = await ActivityData.aggregate([
-      { $match: { date: { $gte: threeMonthsAgo } } },
+      {
+        $match: {
+          co2e: { $exists: true, $ne: null },
+        },
+      },
       {
         $group: {
-          _id: { year: { $year: "$date" }, month: { $month: "$date" } },
+          _id: {
+            year: { $year: "$date" },
+            month: { $month: "$date" },
+          },
           monthlyTotal: { $sum: "$co2e" },
         },
       },
       { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]);
 
-    const avg =
-      monthlyData.reduce((a, b) => a + b.monthlyTotal, 0) /
-      (monthlyData.length || 1);
+    if (monthlyData.length === 0) {
+      return res.json({
+        predictionForNextMonth: {
+          value: null,
+          unit: "kgCO2e",
+        },
+        basedOn: "No usable CO₂e data",
+        trend: "Unknown",
+        confidence: "Very Low",
+        suggestion: "No emission data available for prediction.",
+      });
+    }
 
-    const normalized =
-      avg >= 1000
-        ? { value: +(avg / 1000).toFixed(2), unit: "tCO2e" }
-        : { value: +avg.toFixed(2), unit: "kgCO2e" };
+    const total = monthlyData.reduce(
+      (sum, m) => sum + m.monthlyTotal,
+      0
+    );
+
+    const avgKg = total / monthlyData.length;
+    const avgTons = avgKg / 1000;
+
+    // ---- UNIT NORMALIZATION ----
+    const prediction =
+      avgKg >= 1000
+        ? {
+            value: Number(avgTons.toFixed(2)),
+            unit: "tCO2e",
+          }
+        : {
+            value: Number(avgKg.toFixed(2)),
+            unit: "kgCO2e",
+          };
+
+    // ---- TREND ----
+    let trend = "Stable";
+    if (monthlyData.length >= 2) {
+      const last = monthlyData.at(-1).monthlyTotal;
+      const prev = monthlyData.at(-2).monthlyTotal;
+
+      if (last > prev) trend = "Increasing";
+      else if (last < prev) trend = "Decreasing";
+    }
+
+    // ---- CONFIDENCE ----
+    let confidence = "Low";
+    if (monthlyData.length >= 3) confidence = "Medium";
+    if (monthlyData.length >= 6) confidence = "High";
+
+    // ---- FIXED SUGGESTION LOGIC ----
+    let suggestion = "On track to meet reduction goals.";
+
+    if (trend === "Increasing" && avgTons > MONTHLY_LIMIT_TCO2E) {
+      suggestion = "Projected to exceed limits. Reduce emissions.";
+    }
+
+    if (trend === "Increasing" && avgTons <= MONTHLY_LIMIT_TCO2E) {
+      suggestion = "Emissions rising. Monitor and optimize activities.";
+    }
+
+    if (trend === "Decreasing") {
+      suggestion = "Emissions are decreasing. Maintain current strategies.";
+    }
 
     res.json({
-      predictionForNextMonth: normalized,
-      basedOn: "3-month moving average",
-      trend:
-        monthlyData.length >= 2 &&
-        monthlyData[monthlyData.length - 1].monthlyTotal >
-          monthlyData[0].monthlyTotal
-          ? "Increasing"
-          : "Stable",
-      confidence:
-        monthlyData.length >= 6
-          ? "High"
-          : monthlyData.length >= 3
-          ? "Medium"
-          : "Low",
-      suggestion:
-        avg > 1000
-          ? "Projected to exceed limits. Reduce consumption."
-          : "On track to meet reduction goals.",
+      predictionForNextMonth: prediction,
+      basedOn: "Historical monthly average",
+      trend,
+      confidence,
+      suggestion,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
+
 
 exports.getComparison = async (req, res) => {
   try {

@@ -23,12 +23,10 @@ const RiskDominanceChart = ({ category, impact, suggestion }: Props) => {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
       <h3 className="text-sm font-semibold text-gray-800 mb-2">
         Risk Dominance
       </h3>
 
-      {/* Chart */}
       <div className="flex-1 relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -49,14 +47,12 @@ const RiskDominanceChart = ({ category, impact, suggestion }: Props) => {
           </PieChart>
         </ResponsiveContainer>
 
-        {/* Center Label */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <p className="text-3xl font-bold text-gray-900">{riskScore}%</p>
           <p className="text-xs text-gray-500">Risk Share</p>
         </div>
       </div>
 
-      {/* Footer */}
       <div className="pt-3 text-center">
         <p className="text-sm font-semibold capitalize">{category}</p>
 
