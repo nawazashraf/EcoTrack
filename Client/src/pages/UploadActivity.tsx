@@ -60,26 +60,29 @@ const UploadActivity = () => {
   };
 
   /* ---------------- TEMPLATE DOWNLOAD ---------------- */
-  const downloadTemplate = () => {
-    const csvContent =
-      "Value,Unit,Date,Department\n" +
-      "1200,kWh,2024-01-01,Operations\n" +
-      "3500,kWh,2024-01-02,Engineering\n" +
-      "120,liters,2024-01-01,Logistics\n" +
-      "260,liters,2024-01-02,Logistics\n" +
-      "350,kg,2024-01-01,Admin\n" +
-      "1500,kg,2024-01-01,Engineering\n";
+const downloadTemplate = () => {
+  const csvContent =
+    "Category,Value,Unit,Date,Department\n" +
+    "electricity,1200,kWh,01-01-2024,Operations\n" +
+    "electricity,3500,kWh,01-01-2024,Engineering\n" +
+    "transportation,120,liters,01-01-2024,Logistics\n" +
+    "fuel,180,liters,01-01-2024,Operations\n" +
+    "waste,350,kg,01-01-2024,Admin\n" +
+    "manufacturing,1500,kg,01-01-2024,Engineering\n";
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "carbon_activity_template.csv";
-    a.click();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "carbon_activity_template.csv";
+  document.body.appendChild(a);
+  a.click();
 
-    URL.revokeObjectURL(url);
-  };
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 
   /* ---------------- UPLOAD ---------------- */
   const handleUploadAndProcess = async () => {
@@ -103,7 +106,7 @@ const UploadActivity = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center px-6">
+    <div className="min-h-screen relative overflow-hidden bg-linear-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center px-6">
       
       {/* ❄️ Snowflakes */}
       <div className="absolute inset-0 pointer-events-none z-0">
